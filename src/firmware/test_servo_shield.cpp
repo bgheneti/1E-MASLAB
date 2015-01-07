@@ -76,8 +76,8 @@ int main()
   // Handle Ctrl-C quit
   signal(SIGINT, sig_handler);
 
-  // Edison i2c bus is 6
-  mraa::I2c* i2c = new mraa::I2c(6);
+  // Edison i2c bus is 0
+  mraa::I2c* i2c = new mraa::I2c(0);
   assert(i2c != nullptr);
 
   while (running) {
