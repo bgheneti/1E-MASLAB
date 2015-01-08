@@ -37,6 +37,6 @@ int main() {
             setMotorSpeed(pwm, dir, 0.0);
             sleep(2.0);
         }
-        unsleep(100000);
+        usleep(100000);
     }
 }

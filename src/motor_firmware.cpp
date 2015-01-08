@@ -3,9 +3,7 @@
 #include <csignal>
 #include <iostream>
 
-#include "mraa.hpp"
-
-#include "motor_firmware.h"
+#include "include/motor_firmware.h"
 
 void setMotorSpeed(mraa::Pwm& pwm, mraaa::Gpio& dir, double speed) {
     assert(-1.0 <= speed && speed <= 1.0);

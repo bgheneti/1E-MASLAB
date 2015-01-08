@@ -1,6 +1,7 @@
 Created by https://www.gitignore.io
 
 ### Mraa ###
+mraa.h
 mraa.hpp
 mraa/
 
