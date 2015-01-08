@@ -1,4 +1,8 @@
-reated by https://www.gitignore.io
+Created by https://www.gitignore.io
+
+### Mraa ###
+mraa.hpp
+mraa/
 
 ### C++ ###
 # Compiled Object files
