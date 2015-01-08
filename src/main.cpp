@@ -4,7 +4,7 @@
 #include <iostream>
 
 #include "mraa.hpp"
-#include "include/motor_firmware.h"
+#include "../include/motor_firmware.h"
 int running = 1;
 
 void sig_handler(int signo) {

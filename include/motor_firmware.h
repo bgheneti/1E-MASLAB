@@ -3,6 +3,6 @@
 
 #include "mraa.hpp"
 
-void setMotorSpeed(Pwm& pwm, Gpio& dir, double speed);
+void setMotorSpeed(mraa::Pwm& pwm, mraa::Gpio& dir, double speed);
 
 #endif
