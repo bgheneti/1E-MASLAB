@@ -12,7 +12,7 @@ INC := -I include
 
 $(TARGET): $(OBJECTS)
 	@echo " Linking..."
-	@echo " $(CC) $^ -o $(TARGET) $(LIB)"; $(CC) $^ -o $(TARGET) $(lIB)
+	@echo " $(CC) $(CFLAGS) main.cpp -o $(TARGET) $(LIB)"; $(CC) $(CFLAGS) main.cpp -o $(TARGET) $(lIB)
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 	@mkdir -p $(BUILDDIR)
