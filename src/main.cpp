@@ -47,11 +47,15 @@ int main() {
     setMotorSpeed(pwmL, dirL, speed);
     setMotorSpeed(pwmR, dirR, speed);
     while(running) {
+        running++;
         encoderL.poll();     
-	encoderR.poll();
+   	    encoderR.poll();
+        if(running > 100000) {
+            running = 0;
+        }
     }
-    std::cout << encoderL.getNumTicks();
-    std::cout << encoderR.getNumTicks();
-    setMotorSpeed(pwmL, dirL, 0);
-    setMotorSpeed(pwmR, dirR, 0);
+    printf("Left encoder reads: %d",  encoderL.getNumTicks());
+    printf("Right encoder reads: %d",  encoderR.getNumTicks());
+    setMotorSpeed(pwmL, dirL, 0.00);
+    setMotorSpeed(pwmR, dirR, 0.00);
 }
