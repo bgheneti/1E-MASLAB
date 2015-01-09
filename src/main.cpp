@@ -17,26 +17,31 @@ void sig_handler(int signo) {
 int main() {
     signal(SIGINT, sig_handler);
     
-    mraa::Pwm pwm = mraa::Pwm(9);
-    pwm.write(0.0);
-    pwm.enable(true);
+    // Motor 1 setup
+    mraa::Pwm pwmL = mraa::Pwm(9);
+    pwmL.write(0.0);
+    pwmL.enable(true);
 
-    mraa::Gpio dir = mraa::Gpio(8);
+    mraa::Gpio dirL = mraa::Gpio(8);
 
-    dir.dir(mraa::DIR_OUT);
-    dir.write(0);
+    dirL.dir(mraa::DIR_OUT);
+    dirL.write(0);
 
-    double speed = -1.0;
+    // Motor 2 setup
+    mraa::Pwm pwmR = mraa::Pwm(3);
+    pwmR.write(0.0);
+    pwmR.enable(true);
+
+    mraa::Gpio dirR = mraa::Gpio(2);
+    
+    dirR.dir(mraa::DIR_OUT);
+    dirR.write(0);
+
+    double speed = 1.0;
     while(running) {
         std::cout << "Speed: " << speed << std::endl;
-        setMotorSpeed(pwm, dir, speed);
-    
-        speed += .1;
-        if(speed > 1.0) {
-            speed = -1.0;
-            setMotorSpeed(pwm, dir, 0.0);
-            sleep(2.0);
-        }
+        setMotorSpeed(pwmL, dirL, speed);
+        
         usleep(100000);
     }
 }
