@@ -23,7 +23,7 @@ namespace firmware
         gpio[0] = mraa::Gpio(inputPin1);
         gpio[1] = mraa::Gpio(inputPin2);
         state = gpio[0].read()<<1 + gpio[1].read();
-        stateTicks = {0, 0, 0, 0};
+        for(int i=0; i<4; i++) {stateTicks[i]=0}
     }
 
     // Read the value on the pins at that time and stores the state.
@@ -41,7 +41,6 @@ namespace firmware
     // Returns the max of the stateTicks array because it is possible we skipped a state
     // by mistake somewhere.
     int Encoder::getNumTicks() {
-        return std::max(stateTicks);
         int maxTicks=0;
         for(int i=0; i<4; i++) {
             if(stateTicks[i] > maxTicks) {
@@ -53,10 +52,7 @@ namespace firmware
 
     // Reset the number of ticks to 0.
     void Encoder::resetNumTicks() {
-        stateTicks[0] = 0;
-        stateTicks[1] = 0;
-        stateTicks[2] = 0;
-        stateTicks[3] = 0;
+        for(int i=0; i<4; i++) {stateTicks[i]=0}
     }
 
 }  
