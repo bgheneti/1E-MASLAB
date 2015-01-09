@@ -37,11 +37,13 @@ int main() {
     dirR.dir(mraa::DIR_OUT);
     dirR.write(0);
 
-    double speed = 1.0;
+    double speed = 0.25;
     while(running) {
         std::cout << "Speed: " << speed << std::endl;
         setMotorSpeed(pwmL, dirL, speed);
-        
+        setMotorSpeed(pwmR, dirR, speed); 
         usleep(100000);
     }
+    setMotorSpeed(pwmL, dirL, 0);
+    setMotorSpeed(pwmR, dirR, 0);
 }
