@@ -19,7 +19,6 @@ namespace firmware
     //      encoder.reset(); // Reset the tick count to 0
     //
 
-
     Encoder::Encoder(int inputPin1, int inputPin2) {
         gpio[0] = mraa::Gpio(inputPin1);
         gpio[1] = mraa::Gpio(inputPin2);
