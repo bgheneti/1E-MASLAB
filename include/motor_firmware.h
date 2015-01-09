@@ -1,8 +1,26 @@
-#ifndef __MOTOR_FIRMWARE_H_INCLUDED__
-#define __MOTOR_FIRMWARE_H_INCLUDED__
+#ifndef INCLUDE_MOTOR_FIRMWARE_H_
+#define INCLUDE_MOTOR_FIRMWARE_H_
 
 #include "mraa.hpp"
 
-void setMotorSpeed(mraa::Pwm& pwm, mraa::Gpio& dir, double speed);
+namespace firmware {
+    class Motor {
+        private:
+            double speed;
+            mraa::Pwm pwm;
+            mraa::Gpio dir;
+        public:
+            // Creates a new motor object that has a pwm pin and a gpio direction pin
+            Motor(int pwmPin, int dirPin);
+            
+            // Sets the speed of the motor to be newSpeed
+            void setSpeed(double newSpeed);
 
+            // Stops the motor abruptly
+            void stopMotor();
+
+            // Gets the speed of the motor
+            double getSpeed();
+    };
+}
 #endif

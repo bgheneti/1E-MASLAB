@@ -19,33 +19,17 @@ void sig_handler(int signo) {
 int main() {
     signal(SIGINT, sig_handler);
     
-    // Motor 1 setup
-    mraa::Pwm pwmL = mraa::Pwm(9);
-    pwmL.write(0.0);
-    pwmL.enable(true);
+    // Motor setup
+    firmware::Motor motorR = firmware::Motor(9, 8);
+    firmware::Motor motorL = firmware::Motor(3, 2);
 
-    mraa::Gpio dirL = mraa::Gpio(8);
-
-    dirL.dir(mraa::DIR_OUT);
-    dirL.write(0);
-
-    // Motor 2 setup
-    mraa::Pwm pwmR = mraa::Pwm(3);
-    pwmR.write(0.0);
-    pwmR.enable(true);
-
-    mraa::Gpio dirR = mraa::Gpio(2);
-    
-    dirR.dir(mraa::DIR_OUT);
-    dirR.write(0); 
-
-    // Encoder
+    // Encoder setup
     firmware::Encoder encoderL = firmware::Encoder(4, 5);
     firmware::Encoder encoderR = firmware::Encoder(6, 7);
 
     double speed = 0.25;
-    setMotorSpeed(pwmL, dirL, speed);
-    setMotorSpeed(pwmR, dirR, speed);
+    motorR.setSpeed(pwmL, dirL, speed);
+    motorLsetSpeed(pwmR, dirR, speed);
     while(running) {
         running++;
         encoderL.poll();     
@@ -56,6 +40,7 @@ int main() {
     }
     printf("Left encoder reads: %d",  encoderL.getNumTicks());
     printf("Right encoder reads: %d",  encoderR.getNumTicks());
-    setMotorSpeed(pwmL, dirL, 0.00);
-    setMotorSpeed(pwmR, dirR, 0.00);
+    motorR.stop();
+    motorL.stop();
 }
+
