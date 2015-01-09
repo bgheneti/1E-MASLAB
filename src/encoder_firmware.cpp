@@ -19,16 +19,14 @@ namespace firmware
     //      encoder.reset(); // Reset the tick count to 0
     //
 
-    Encoder::Encoder(int inputPin1, int inputPin2) {
-        gpio[0] = mraa::Gpio(inputPin1);
-        gpio[1] = mraa::Gpio(inputPin2);
-        state = gpio[0].read()<<1 + gpio[1].read();
-        for(int i=0; i<4; i++) {stateTicks[i]=0}
+    Encoder::Encoder(int inputPin1, int inputPin2) : gpio1(inputPin1), gpio2(inputPin2) {
+        state = gpio1.read()<<1 + gpio2.read();
+        for(int i=0; i<4; i++) {stateTicks[i]=0;}
     }
 
     // Read the value on the pins at that time and stores the state.
     void Encoder::poll() {
-        int newState = gpio[0].read()<<1 + gpio[1].read();;
+        int newState = gpio1.read()<<1 + gpio2.read();;
         assert(newState<4 && newState>=0);
         if(newState != state) {
             state = newState;
@@ -52,7 +50,7 @@ namespace firmware
 
     // Reset the number of ticks to 0.
     void Encoder::resetNumTicks() {
-        for(int i=0; i<4; i++) {stateTicks[i]=0}
+        for(int i=0; i<4; i++) {stateTicks[i]=0;}
     }
 
 }  

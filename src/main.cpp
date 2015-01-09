@@ -3,6 +3,7 @@
 #include <csignal>
 #include <iostream>
 
+#include "mraa.hpp"
 #include "../include/motor_firmware.h"
 #include "../include/encoder_firmware.h"
 
@@ -47,7 +48,7 @@ int main() {
     setMotorSpeed(pwmR, dirR, speed);
     while(running) {
         encoderL.poll();     
-        encoderR.poll();     
+	encoderR.poll();
     }
     std::cout << encoderL.getNumTicks();
     std::cout << encoderR.getNumTicks();
