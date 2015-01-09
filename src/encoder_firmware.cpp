@@ -26,11 +26,13 @@ namespace firmware
 
     // Read the value on the pins at that time and stores the state.
     void Encoder::poll() {
-        int newState = gpio1.read()<<1 + gpio2.read();;
-        assert(newState<4 && newState>=0);
-        if(newState != state) {
-            state = newState;
-            stateTicks[state] = newState;
+//        int newState = gpio1.read()<<1 + gpio2.read();;
+        printf("gpio1: %d", gpio1.read());
+        printf("gpio2: %d", gpio2.read());
+//        assert(newState<4 && newState>=0);
+//        if(newState != state) {
+//            state = newState;
+//            stateTicks[state] = newState;
         }
     }
 

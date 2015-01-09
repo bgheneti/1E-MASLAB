@@ -20,7 +20,7 @@ int main() {
     signal(SIGINT, sig_handler);
     
     // Motor 1 setup
-    mraa::Pwm pwmL = mraa::Pwm(9);
+ /*   mraa::Pwm pwmL = mraa::Pwm(9);
     pwmL.write(0.0);
     pwmL.enable(true);
 
@@ -37,21 +37,21 @@ int main() {
     mraa::Gpio dirR = mraa::Gpio(2);
     
     dirR.dir(mraa::DIR_OUT);
-    dirR.write(0);
+    dirR.write(0); */
 
     // Encoder
     firmware::Encoder encoderL = firmware::Encoder(4, 5);
     firmware::Encoder encoderR = firmware::Encoder(6, 7);
 
     double speed = 0.25;
-    setMotorSpeed(pwmL, dirL, speed);
-    setMotorSpeed(pwmR, dirR, speed);
+//    setMotorSpeed(pwmL, dirL, speed);
+//    setMotorSpeed(pwmR, dirR, speed);
     while(running) {
         encoderL.poll();     
 	encoderR.poll();
     }
     std::cout << encoderL.getNumTicks();
     std::cout << encoderR.getNumTicks();
-    setMotorSpeed(pwmL, dirL, 0);
-    setMotorSpeed(pwmR, dirR, 0);
+//    setMotorSpeed(pwmL, dirL, 0);
+//    setMotorSpeed(pwmR, dirR, 0);
 }
