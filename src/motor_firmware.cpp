@@ -1,7 +1,5 @@
 #include <cassert>
 #include <cmath>
-#include <csignal>
-#include <iostream>
 
 #include "../include/motor_firmware.h"
 
