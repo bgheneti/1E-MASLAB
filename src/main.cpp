@@ -28,8 +28,8 @@ int main() {
     firmware::Encoder encoderR = firmware::Encoder(6, 7);
 
     double speed = 0.25;
-    motorR.setSpeed(pwmL, dirL, speed);
-    motorLsetSpeed(pwmR, dirR, speed);
+    motorR.setSpeed(speed);
+    motorL.setSpeed(speed);
     while(running) {
         running++;
         encoderL.poll();     
