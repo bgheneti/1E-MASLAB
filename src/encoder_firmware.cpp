@@ -42,11 +42,21 @@ namespace firmware
     // by mistake somewhere.
     int Encoder::getNumTicks() {
         return std::max(stateTicks);
+        int maxTicks=0;
+        for(int i=0; i<4; i++) {
+            if(stateTicks[i] > maxTicks) {
+                maxTicks = stateTicks[i];
+            }
+        }
+        return maxTicks;
     }
 
     // Reset the number of ticks to 0.
     void Encoder::resetNumTicks() {
-        stateTicks = {0, 0, 0, 0};
+        stateTicks[0] = 0;
+        stateTicks[1] = 0;
+        stateTicks[2] = 0;
+        stateTicks[3] = 0;
     }
 
 }  
