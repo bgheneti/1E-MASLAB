@@ -5,6 +5,8 @@
 
 #include "mraa.hpp"
 #include "../include/motor_firmware.h"
+#include "../include/encoder_firmware.h"
+
 int running = 1;
 
 void sig_handler(int signo) {
@@ -37,13 +39,17 @@ int main() {
     dirR.dir(mraa::DIR_OUT);
     dirR.write(0);
 
+    // Encoder
+    firmware::Encoder encoderL = firmware::Encoder(4, 5);
+    firmware::Encoder encoderR = firmware::Encoder(6, 7);
+
     double speed = 0.25;
+    setMotorSpeed(pwmL, dirL, speed);
+    setMotorSpeed(pwmR, dirR, speed);
     while(running) {
-        std::cout << "Speed: " << speed << std::endl;
-        setMotorSpeed(pwmL, dirL, speed);
-        setMotorSpeed(pwmR, dirR, speed); 
-        usleep(100000);
+        encoder.poll();     
     }
+    std::cout << encoder.getNumTicks();
     setMotorSpeed(pwmL, dirL, 0);
     setMotorSpeed(pwmR, dirR, 0);
 }
