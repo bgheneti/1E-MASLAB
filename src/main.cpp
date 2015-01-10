@@ -38,8 +38,8 @@ int main() {
     std::this_thread::sleep_for(sleep_time);
     encoderL.stopPolling();
     encoderR.stopPolling();
-    printf("Left encoder reads: %d",  encoderL.getNumTicks());
-    printf("Right encoder reads: %d",  encoderR.getNumTicks());
+    printf("Left encoder reads: %f",  encoderL.getDistance());
+    printf("Right encoder reads: %f",  encoderR.getDistance());
     motorR.stop();
     motorL.stop();
 }
