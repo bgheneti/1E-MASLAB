@@ -30,14 +30,16 @@ int main() {
     double speed = 0.25;
     motorR.setSpeed(speed);
     motorL.setSpeed(speed);
+    encoderL.startPolling();
+    encoderR.startPolling();
     while(running) {
         running++;
-        encoderL.poll();     
-   	    encoderR.poll();
         if(running > 100000) {
             running = 0;
         }
     }
+    encoderL.stopPolling();
+    encoderR.stopPolling();
     printf("Left encoder reads: %d",  encoderL.getNumTicks());
     printf("Right encoder reads: %d",  encoderR.getNumTicks());
     motorR.stop();
