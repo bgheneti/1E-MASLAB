@@ -33,7 +33,7 @@ namespace firmware
             assert(newState<4 && newState>=0);
             if(newState != state) {
                 state = newState;
-                stateTicks[state] = newState;
+                stateTicks[state]++;
             }
         }
     }
@@ -41,12 +41,14 @@ namespace firmware
     // Spawn a new thread to continuously poll the encoder
     void Encoder::startPolling() {
         running = true;
-        std::thread runner(Encoder::poll);
+	std::thread thr(&Encoder::poll, this);
+        std::swap(thr, runner);
     }
 
     // Get the poll thread to return and stop
     void Encoder::stopPolling() {
         running = false;
+	runner.join();
     }
 
     // Get the number of ticks registered since the last time the counter was reset.

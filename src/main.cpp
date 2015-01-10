@@ -2,6 +2,8 @@
 #include <cmath>
 #include <csignal>
 #include <iostream>
+#include <thread>
+#include <chrono>
 
 #include "mraa.hpp"
 #include "../include/motor_firmware.h"
@@ -32,12 +34,8 @@ int main() {
     motorL.setSpeed(speed);
     encoderL.startPolling();
     encoderR.startPolling();
-    while(running) {
-        running++;
-        if(running > 100000) {
-            running = 0;
-        }
-    }
+    std::chrono::milliseconds sleep_time(10000);
+    std::this_thread::sleep_for(sleep_time);
     encoderL.stopPolling();
     encoderR.stopPolling();
     printf("Left encoder reads: %d",  encoderL.getNumTicks());
