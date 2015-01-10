@@ -67,19 +67,19 @@ namespace firmware{
 	std::swap(thr, runner);
     }
     
-    void getAngle(){
+    double Gyro::getAngle(){
 	return angle;
     }
 
-    void getAngularV(){
+    double Gyro::getAngularV(){
 	return angularVelocity;
     }
 
-    void stopPoll(){
+    void Gyro::stopPoll(){
 	running=0;
     }
 
-    void zeroAngle(){
+    void Gyro::zeroAngle(){
 	zero=1;
     }
 }

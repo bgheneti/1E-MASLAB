@@ -4,7 +4,7 @@
 #include "mraa.hpp"
 #include <thread>
 namespace firmware{
-    class GYRO {
+    class Gyro{
         private:
             double angle;
 	    double angularVelocity;
@@ -12,10 +12,13 @@ namespace firmware{
             mraa::Gpio* slaveSelect;
             int slaveSelectPin;
 	    int running;
+	    int zero;
 	    std::thread runner;
         public:
 	    //Creates a new gyro object that has a slave select pin  
 	    Gyro(int slaveSelectPin);
+	    
+	    void poll();
 	    
 	    //start a thread for polling gyro data
 	    void startPoll();
@@ -24,13 +27,13 @@ namespace firmware{
 	    void stopPoll();
 	    
 	    //returns the current angle in degrees
-	    void getAngle();
+	    double getAngle();
 	    
 	    //returns the current angular velocity in degrees/second
 	    double getAngularV();
 
 	    //sets the current angle to zero
-	    double zeroAngle();
+	    void zeroAngle();
     };
 }
 #endif
