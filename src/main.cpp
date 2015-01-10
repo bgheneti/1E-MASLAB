@@ -2,6 +2,8 @@
 #include <cmath>
 #include <csignal>
 #include <iostream>
+#include <thread>
+#include <chrono>
 
 #include "mraa.hpp"
 #include "../include/motor_firmware.h"
@@ -28,16 +30,14 @@ int main() {
     firmware::Encoder encoderR = firmware::Encoder(6, 7);
 
     double speed = 0.25;
-    motorR.setSpeed(pwmL, dirL, speed);
-    motorLsetSpeed(pwmR, dirR, speed);
-    while(running) {
-        running++;
-        encoderL.poll();     
-   	    encoderR.poll();
-        if(running > 100000) {
-            running = 0;
-        }
-    }
+    motorR.setSpeed(speed);
+    motorL.setSpeed(speed);
+    encoderL.startPolling();
+    encoderR.startPolling();
+    std::chrono::milliseconds sleep_time(10000);
+    std::this_thread::sleep_for(sleep_time);
+    encoderL.stopPolling();
+    encoderR.stopPolling();
     printf("Left encoder reads: %d",  encoderL.getNumTicks());
     printf("Right encoder reads: %d",  encoderR.getNumTicks());
     motorR.stop();

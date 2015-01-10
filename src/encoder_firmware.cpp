@@ -3,6 +3,7 @@
 
 #include <cassert>
 #include <cmath>
+#include <thread>
 
 #include "../include/encoder_firmware.h"
 
@@ -11,27 +12,43 @@ namespace firmware
 {
     // This is the class to interact with the motor encoders
     // Sample usage:
-    //      firmware::Encoder encoder = firmware::Encoder(inputPin1, inputPin2)
-    //      while(running) {
-    //          encoder.poll(); // Constantly poll the hardware
-    //      }
-    //      int numTicks = encoder.getNumTicks(); // Get the number of ticks polled
+    //      firmware::Encoder encoder = firmware::Encoder(inputPin1, inputPin2);
+    //      encoder.startPolling();
+    //      int intermediateNumTicks = encoder.getNumTicks(); 
+    //      encoder.stopPolling(); 
+    //      int numTicks = encoder.getNumTicks(); 
     //      encoder.reset(); // Reset the tick count to 0
     //
 
     Encoder::Encoder(int inputPin1, int inputPin2) : gpio1(inputPin1), gpio2(inputPin2) {
         state = gpio1.read()<<1 + gpio2.read();
         for(int i=0; i<4; i++) {stateTicks[i]=0;}
+        running = false;
     }
 
-    // Read the value on the pins at that time and stores the state.
+    // Read the value on the pins repeatedly and stores the state.
     void Encoder::poll() {
-        int newState = (gpio1.read()<<1) + gpio2.read();;
-        assert(newState<4 && newState>=0);
-        if(newState != state) {
-            state = newState;
-            stateTicks[state] = newState;
+        while(running) {
+            int newState = (gpio1.read()<<1) + gpio2.read();;
+            assert(newState<4 && newState>=0);
+            if(newState != state) {
+                state = newState;
+                stateTicks[state]++;
+            }
         }
+    }
+
+    // Spawn a new thread to continuously poll the encoder
+    void Encoder::startPolling() {
+        running = true;
+	std::thread thr(&Encoder::poll, this);
+        std::swap(thr, runner);
+    }
+
+    // Get the poll thread to return and stop
+    void Encoder::stopPolling() {
+        running = false;
+	runner.join();
     }
 
     // Get the number of ticks registered since the last time the counter was reset.
