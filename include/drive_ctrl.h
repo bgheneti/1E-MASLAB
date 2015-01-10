@@ -7,6 +7,8 @@
 #include "encoder_firmware.h"
 #include "motor_firmware.h"
 #include "point.h"
+#include <mutex>
+
 namespace drive {
     
     class DriveTrain {
@@ -15,17 +17,34 @@ namespace drive {
             firmware::Motor rightMotor;
             firmware::Encoder leftEncoder;
             firmware::Encoder rightEncoder;
-            double bias;
+            std::mutex speedLock;
+            double bias;  // The speed the robot should move forward at.
+            double diff;  // The difference between the motors and the bias
+            bool driving;  // Indicates whether the drive module should be
+                           // active, ie, should be maintaining bias and diffs.
 
-            // Sets the motor speeds ensuring no abrupt starts or stops
-            void setMotorSpeeds(leftSpeed, rightSpeed);
+            // Return requestedSpeed if it doesn't change the current speed by
+            // more than .2. Otherwise change the speed by .2 in the correct 
+            // direction.
+            double getNewSpeed(double requestedSpeed, double currentSpeed);
+
+            // Maintain the bias and the diff in the left and right motors.
+            // Don't let the speeds change abruptly.
+            void maintainSpeeds();
 
             // Get the robot to start moving straight
             void straight();
+
+            // Have the robot move straight until some point
+            void straightForDistance(double distance);
             
             // Get the robot to turn. If direction is negative, turn left;
             // if positive turn right.
             void turn(int direction);
+
+            // Have the robot turn for some number of degrees. If degrees
+            // is negative, turn left; if positive turn right.
+            void turnForDegrees(double degrees);
 
             // Stop the robot, decelerating to avoid skidding.
             void stop();
