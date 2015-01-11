@@ -21,7 +21,7 @@ void sig_handler(int signo) {
 int main() {
     signal(SIGINT, sig_handler);
     
-    // Motor setup
+    /*// Motor setup
     firmware::Motor motorR = firmware::Motor(9, 8);
     firmware::Motor motorL = firmware::Motor(3, 2);
 
@@ -42,5 +42,9 @@ int main() {
     printf("Right encoder reads: %d",  encoderR.getNumTicks());
     motorR.stop();
     motorL.stop();
+    */
+
+    firmware::Servo servo = firmware::Servo(6, 0);
+    servo.setServoPosition(90);
 }
 
