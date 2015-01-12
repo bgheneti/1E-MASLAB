@@ -1,4 +1,4 @@
-#include "gyro_firmware.h"
+#include "../include/gyro_firmware.h"
 #include <unistd.h>
 #include <stdint.h>
 #include <signal.h>
