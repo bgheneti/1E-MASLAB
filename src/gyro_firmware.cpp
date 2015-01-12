@@ -6,9 +6,9 @@
 #include <thread>
 
 namespace firmware{
-    
+
     Gyro::Gyro(int slaveSelectPinNumber): slaveSelectPin(slaveSelectPinNumber), slaveSelect(slaveSelectPinNumber), spi(0), zero(0), running(0){}
-    
+
     void Gyro::poll(){
         char rxBuf[2];
         char writeBuf[4];
@@ -57,7 +57,7 @@ long)(tv.tv_sec)*1000 +
 	    usleep(5000);
 	}
     }
-    
+
     void Gyro::startPoll(){
 	if(running==0){
 	    running=1;
@@ -68,7 +68,7 @@ long)(tv.tv_sec)*1000 +
 	    std::swap(thr, runner);
         }
     }
-    
+
     double Gyro::getAngle(){
 	return angle;
     }

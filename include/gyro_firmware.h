@@ -16,18 +16,18 @@ namespace firmware{
             int zero;
 	    void poll();
         public:
-	    //Creates a new gyro object that has a slave select pin  
+	    //Creates a new gyro object that has a slave select pin
 	    Gyro(int slaveSelectPin);
-	    
+
 	    //start a thread for polling gyro data
 	    void startPoll();
-	    
+
 	    //stops polling gyro data
 	    void stopPoll();
-	    
+
 	    //returns the current angle in degrees
 	    double getAngle();
-	    
+
 	    //returns the current angular velocity in degrees/second
 	    double getAngularV();
 
