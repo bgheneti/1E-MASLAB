@@ -1,8 +1,10 @@
+#include <cassert>
+#include <iostream>
 #include "i2c_pwm_wrapper.h"
 
 namespace utils {
 
-    I2cPwmWrapper::I2cPwmWrapper(int bus, int outputPin) {
+    I2cPwmWrapper::I2cPwmWrapper(int outputPin) : i2c(BUS_NUMBER) {
         outputPin = outputPin;
 
         writeBuf[0] = 0x00; // Write to MODE 1 Register;
@@ -25,15 +27,19 @@ namespace utils {
         i2c.write(writeBuf, 2);
     }
 
-    I2cPwmWrapper::writePWM(double duty) {
+    void I2cPwmWrapper::write(double duty) {
         assert(0.0 <= duty && duty <= 1.0);
         int on = (int) (4095.0*duty);
+
+        std::cout << on << std::endl;
 
         writeBuf[0] = 6 + 4*outputPin;
         writeBuf[1] = 0x00; // ON LSB
         writeBuf[2] = 0x00; // ON MSB
         writeBuf[3] = on & 0xFF; // OFF LSB
         writeBuf[4] = (on >> 8) & 0xFF; // OFF MSB
+	i2c.address(SHIELD_I2C_ADDR);
+	i2c.write(writeBuf, 5);
     }
 }
 

@@ -8,6 +8,8 @@
 #include "mraa.hpp"
 #include "../include/motor_firmware.h"
 #include "../include/encoder_firmware.h"
+#include "../include/servo_firmware.h"
+#include "../include/i2c_pwm_wrapper.h"
 
 int running = 1;
 
@@ -20,7 +22,6 @@ void sig_handler(int signo) {
 
 int main() {
     signal(SIGINT, sig_handler);
-    
     /*// Motor setup
     firmware::Motor motorR = firmware::Motor(9, 8);
     firmware::Motor motorL = firmware::Motor(3, 2);
@@ -44,7 +45,10 @@ int main() {
     motorL.stop();
     */
 
-    firmware::Servo servo = firmware::Servo(6, 0);
-    servo.setServoPosition(90);
+    firmware::Servo servo = firmware::Servo(0);
+    servo.setServoPosition(-90.0);
+    std::chrono::milliseconds sleep_time(10000);
+    std::this_thread::sleep_for(sleep_time);
+    servo.setServoPosition(90.0);
 }
 
