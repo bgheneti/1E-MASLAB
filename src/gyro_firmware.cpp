@@ -7,7 +7,7 @@
 
 namespace firmware{
 
-    Gyro::Gyro(int slaveSelectPinNumber): slaveSelectPin(slaveSelectPinNumber), slaveSelect(slaveSelectPinNumber), spi(0), zero(0), running(0){}
+    Gyro::Gyro(int slaveSelectPinNumber): slaveSelectPin(slaveSelectPinNumber), slaveSelect(slaveSelectPinNumber), spi(0), zero(0), running(0), newRateConstant(50){}
 
     void Gyro::poll(){
         char rxBuf[2];
@@ -43,8 +43,8 @@ long)(tv.tv_sec)*1000 +
 			(unsigned long long)(tv.tv_usec) / 1000;
 		    int msi = (int)ms;
 		    float msf = (float)msi;
-		    angularVelocity = (double)reading;
-		    angle += -0.001 * msf * (angularVelocity / 80.0);
+		    angularVelocity = (msf/newRateConstant)*((double)reading)+(1-msf/newRateConstant)*angularVelocity;
+		    double newAngle += -0.001 * msf * (angularVelocity / 80.0);
 		}
 		else {
 		    init = 1;
