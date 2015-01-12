@@ -6,12 +6,14 @@ namespace drive {
     DriveTrain::DriveTrain(firmware::Motor leftMotor, 
                            firmware::Motor rightMotor,
                            firmware::Encoder leftEncoder,
-                           firmware::Encoder rightEncoder) {
+                           firmware::Encoder rightEncoder,
+                           firmware::Gyro gyro) {
         
         leftMotor = leftMotor;
         rightMotor = rightMotor;
         leftEncoder = leftEncoder;
         rightEncoder = rightEncoder;
+        gyro = gyro;
         bias = 0;
         diff = 0;
         driving = false;
@@ -50,30 +52,60 @@ namespace drive {
         }
     }
 
-    // Get the robot to start moving straight
-    void DriveTrain::straight() {
-
+    void DriveTrain::resetSensors() {
+        leftEncoder.resetNumTicks();
+        rightEncoder.resetNumTicks();
+        gyro.zeroAngle();
+    
     }
 
-    // Have the robot move straight until some point
-    void DriveTrain::straightForDistance(double distance) {
+    // Get the robot to start moving straight. Forward if direction > 0,
+    // otherwise backward
+    void DriveTrain::straight(int direction) {
+        resetSensors();
+        if(direction > 0) {
+            bias = SPEED;
+        } else {
+            bias = -SPEED;
+        }
+        driving = true;
+        maintainSpeeds();
 
+        time_t currentTime = timer(NULL);
+
+        while(driving) {
+            speedLock.lock();
+            // PID Control
+            double delta = -gyro.getAngle();
+            time_t nextTime = timer(NULL);
+            double dT = difftime(nextTime, currentTime);
+            currentTime = nextTime;
+            double integral += delta * dT;
+            double derivative = gyro.getAngularV();
+            diff = P*delta + I*integral + D*derivative;
+            speedLock.unlock();
     }
-            
+
     // Get the robot to turn. If direction is negative, turn left;
     // if positive turn right.
     void DriveTrain::turn(int direction) {
 
     }
 
-    // Have the robot turn for some number of degrees. If degrees
-    // is negative, turn left; if positive turn right.
-    void DriveTrain::turnForDegrees(double degrees) {
+    // Stop the robot, decelerating to avoid skidding.
+    void stop() {
 
     }
 
-    // Stop the robot, decelerating to avoid skidding.
-    void stop() {
+    // Have the robot move straight until some point. If distance > 0,
+    // go forward, otherwise go backward
+    void DriveTrain::straightForDistance(double distance) {
+
+    }
+            
+    // Have the robot turn for some number of degrees. If degrees
+    // is negative, turn left; if positive turn right.
+    void DriveTrain::turnForDegrees(double degrees) {
 
     }
 
