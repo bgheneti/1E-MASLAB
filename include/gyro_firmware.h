@@ -8,15 +8,15 @@ namespace firmware{
         private:
             double angle;
 	    double angularVelocity;
-	    mraa::Spi* spi;
-            mraa::Gpio* slaveSelect;
+	    mraa::Spi spi= mraa::Spi(0);
+            mraa::Gpio slaveSelect;
             int slaveSelectPin;
 	    int running;
 	    int zero;
 	    std::thread runner;
         public:
 	    //Creates a new gyro object that has a slave select pin  
-	    Gyro(int slaveSelectPin);
+	    Gyro(int slaveSelectPinNumber);
 	    
 	    void poll();
 	    

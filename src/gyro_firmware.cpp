@@ -4,12 +4,13 @@
 #include <signal.h>
 #include <sys/time.h>
 #include <thread>
-
+#include <assert.h>
 namespace firmware{
     
-    Gyro::Gyro(int slaveSelectPinNumber): slaveSelectPin(slaveSelectPin){}
+  Gyro::Gyro(int slaveSelectPinNumber): slaveSelectPin(slaveSelectPinNumber), slaveSelect(slaveSelectPin), spi(0) {zero=0;}
     
     void Gyro::poll(){
+        printf("polling");
         char rxBuf[2];
         char writeBuf[4];
         unsigned int sensorRead = 0x20000000;
@@ -24,14 +25,15 @@ namespace firmware{
 		angle=0;
 		zero=0;
 	    }
-	    slaveSelect->write(0);
-            char* recv = spi->write(writeBuf, 4);
-            slaveSelect->write(1);
+	    slaveSelect.write(0);
+            printf("before");
+	    char * recv={spi.write(writeBuf, 4)};
+	    slaveSelect.write(1);
 	    if (recv != NULL) {
-		unsigned int recvVal = 0 | recv[3];
-		recvVal = (recvVal << 8) | recv[2];
-		recvVal = (recvVal << 8) | recv[1];
-		recvVal = (recvVal << 8) | recv[0];
+	        unsigned int recvVal = 0 | *(recv+3);
+	        recvVal = (recvVal << 8) | *(recv+2);
+	        recvVal = (recvVal << 8) | *(recv+1);
+	        recvVal = (recvVal << 8) | *recv;
 		// Sensor reading
 		short reading = (recvVal >> 10) & 0xffff;
 		if (init) {
@@ -58,13 +60,17 @@ namespace firmware{
     }
     
     void Gyro::startPoll(){
-	slaveSelect = new mraa::Gpio(slaveSelectPin);
-	slaveSelect->dir(mraa::DIR_OUT);
-	slaveSelect->write(1);
-	spi = new mraa::Spi(0);
-        spi->bitPerWord(32);
-	std::thread thr(&Gyro::poll, this);
-	std::swap(thr, runner);
+      printf("dir: %d",mraa::DIR_IN);
+      fflush(stdout);
+      //slaveSelect.dir(mraa::DIR_OUT);
+      mraa::Gpio * slave = new mraa::Gpio(3);
+      slave->dir(mraa::DIR_IN);
+      delete(slave);
+	//slaveSelect.write(1);
+        //spi.bitPerWord(32);
+	//	std::thread thr(&Gyro::poll, this);
+	//	std::swap(thr, runner);
+	//poll();
     }
     
     double Gyro::getAngle(){
