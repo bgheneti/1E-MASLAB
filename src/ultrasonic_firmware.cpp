@@ -1,4 +1,4 @@
-#include <time.h>
+#include <sys/time.h>
 
 #include "../include/ultrasonic_firmware.h"
 
@@ -13,7 +13,8 @@ namespace firmware{
   //returns distance in centimeters
   double UltrasonicSensor::getDistance(){
     //variables for counting clock ticks
-    clock_t start, stop;
+    //clock_t start, stop;
+    struct timeval start, stop;
     
     //send pulse
     trigger.write(1);
@@ -21,23 +22,38 @@ namespace firmware{
     trigger.write(0);
     
     //record starting time
-    start = clock();
-    stop = clock();
+    //start = clock();
+    //stop = clock();
+    gettimeofday(&start, NULL);
+    gettimeofday(&stop, NULL);
+    int secs = stop.tv_sec - start.tv_sec;
+    int usecs = stop.tv_usec - start.tv_usec;
+    double diff = double(secs)+0.000001*usecs;
     
     //listen for echo
-    while(echo.read()==0 && (stop - start)/CLOCKS_PER_SEC < 0.1){
-      stop = clock();
+    while(echo.read()==0 && diff < 0.1){
+      gettimeofday(&stop, NULL);
+      secs = stop.tv_sec - start.tv_sec;
+      usecs = stop.tv_usec - start.tv_usec;
+      diff = double(secs)+0.000001*usecs;
     }
     //switch over to the correct variables
     //start will actually be the start of the response
     //and stop will be its end
     start = stop;
-    stop = clock();
-    while(echo.read() == 1 && (stop - start)/CLOCKS_PER_SEC < 0.1){
-      stop = clock();
+    gettimeofday(&stop, NULL);
+    secs = stop.tv_sec - start.tv_sec;
+    usecs = stop.tv_usec - start.tv_usec;
+    diff = double(secs)+0.000001*usecs;
+    
+    while(echo.read() == 1 && diff < 0.1){
+      gettimeofday(&stop, NULL);
+      secs = stop.tv_sec - start.tv_sec;
+      usecs = stop.tv_usec - start.tv_usec;
+      diff = double(secs)+0.000001*usecs;
     }
     
     //calculate distance
-    return ((double)(stop-start))/CLOCKS_PER_SEC*34000/2;
+    return diff*34000/2;
   }
 }
