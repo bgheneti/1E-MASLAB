@@ -3,11 +3,10 @@
 #include <stdint.h>
 #include <signal.h>
 #include <thread>
-
+int MS=1000;
 namespace firmware{
 
-    Gyro::Gyro(int slaveSelectPinNumber): slaveSelectPin(slaveSelectPinNumber), slaveSelect(slaveSelectPinNumber), spi(0), zero(0), running(0){}
-
+    Gyro::Gyro(int slaveSelectPinNumber): slaveSelectPin(slaveSelectPinNumber), slaveSelect(slaveSelectPinNumber), spi(0), zero(0), running(0), newRateConstant(15){}
     void Gyro::poll(){
         char rxBuf[2];
         char writeBuf[4];
@@ -18,6 +17,10 @@ namespace firmware{
         writeBuf[3] = (sensorRead >> 24) & 0xff;
         struct timeval tv;
         int init = 0;
+	int biasCalcRuns=50;
+	int totalBiasCalcRuns=biasCalcRuns;
+	double bias=0;
+	angle=0;
 	while(running){
 	    if(zero){
 		angle=0;
@@ -27,23 +30,32 @@ namespace firmware{
             char* recv = spi.write(writeBuf, 4);
             slaveSelect.write(1);
 	    if (recv != NULL) {
-		unsigned int recvVal = 0 | recv[3];
-		recvVal = (recvVal << 8) | recv[2];
-		recvVal = (recvVal << 8) | recv[1];
-		recvVal = (recvVal << 8) | recv[0];
-		// Sensor reading
+	        unsigned int recvVal = ((uint8_t) recv[3] & 0xFF);
+	        recvVal = (recvVal << 8) | ((uint8_t)recv[2] & 0xFF);
+	        recvVal = (recvVal << 8) | ((uint8_t)recv[1] & 0xFF);
+	        recvVal = (recvVal << 8) | ((uint8_t)recv[0] & 0xFF);  
+	        // Sensor reading
 		short reading = (recvVal >> 10) & 0xffff;
 		if (init) {
-		    unsigned long long ms = (unsigned long 
-long)(tv.tv_sec)*1000 +
-			(unsigned long long)(tv.tv_usec) / 1000;
+		    unsigned long long ms = (unsigned long long)(tv.tv_sec)*1000 + 
+		      (unsigned long long)(tv.tv_usec) / 1000;
 		    gettimeofday(&tv, NULL);
 		    ms -= (unsigned long long)(tv.tv_sec)*1000 +
-			(unsigned long long)(tv.tv_usec) / 1000;
+		      (unsigned long long)(tv.tv_usec) / 1000;
 		    int msi = (int)ms;
 		    float msf = (float)msi;
-		    angularVelocity = (double)reading;
-		    angle += -0.001 * msf * (angularVelocity / 80.0);
+		    float rf = (float) reading;
+		    if(biasCalcRuns>0){
+		        bias+= -0.001 * msf * ((rf / 80.0) / totalBiasCalcRuns);
+		        biasCalcRuns--;
+		        printf("msf: %f",msf);
+		    }
+		    else{
+		      double newAngularVelocity= -0.001 * msf * (rf / 80.0)-bias;
+		      angularVelocity = (-msf/newRateConstant)*(newAngularVelocity)+
+			(1+msf/newRateConstant)*angularVelocity;
+		      angle+=angularVelocity;
+		    }
 		}
 		else {
 		    init = 1;
@@ -53,7 +65,7 @@ long)(tv.tv_sec)*1000 +
 	    else {
 		printf("No recv\n");
 	    }
-	    usleep(5000);
+	    usleep(10*MS);
 	}
     }
 
@@ -61,7 +73,7 @@ long)(tv.tv_sec)*1000 +
 	if(running==0){
 	    running=1;
 	    slaveSelect.dir(mraa::DIR_OUT);
-            slaveSelect.write(0);
+            slaveSelect.write(1);
             spi.bitPerWord(32);
 	    std::thread thr(&Gyro::poll, this);
 	    std::swap(thr, runner);
