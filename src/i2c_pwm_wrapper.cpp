@@ -1,6 +1,6 @@
 #include <cassert>
 #include <iostream>
-#include "i2c_pwm_wrapper.h"
+#include "../include/i2c_pwm_wrapper.h"
 
 namespace utils {
 
