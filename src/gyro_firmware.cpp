@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <signal.h>
 #include <thread>
+#include <sys/time.h>
+
 int MS=1000;
 namespace firmware{
 
