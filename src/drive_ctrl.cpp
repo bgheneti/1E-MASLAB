@@ -50,8 +50,16 @@ namespace drive {
             integral += diff * dT;
             double derivative = gyro->getAngularV();
             power = P*diff + I*integral + D*derivative;
-            leftMotor->setSpeed(bias + power);
-            rightMotor->setSpeed(bias - power);
+            double leftMotorSpeed = bias - power;
+            double rightMotorSpeed = bias + power;
+            if(std::abs(leftMotorSpeed) > .3) {
+                leftMotorSpeed = leftMotorSpeed < 0 ? -.3 : .3;
+            }
+            if(std::abs(rightMotorSpeed) > .3) {
+                rightMotorSpeed = rightMotorSpeed < 0 ? -.3: .3;
+            }
+            leftMotor->setSpeed(leftMotorSpeed);
+            rightMotor->setSpeed(rightMotorSpeed);
             usleep(100000);
         }
      	leftMotor->setSpeed(0.0);

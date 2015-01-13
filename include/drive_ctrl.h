@@ -12,7 +12,7 @@
 #include <cmath>
 
 #define SPEED .1
-#define P 0
+#define P 1
 #define I 0
 #define D 0
 
