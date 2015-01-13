@@ -22,7 +22,7 @@ void sig_handler(int signo) {
 
 int main() {
     signal(SIGINT, sig_handler);
-    /*// Motor setup
+    // Motor setup
     firmware::Motor motorR = firmware::Motor(9, 8);
     firmware::Motor motorL = firmware::Motor(3, 2);
 
@@ -30,6 +30,13 @@ int main() {
     firmware::Encoder encoderL = firmware::Encoder(4, 5);
     firmware::Encoder encoderR = firmware::Encoder(6, 7);
 
+    // Gyro setup
+    firmware::Gyro gyro = firmware::Gyro(10);
+
+    drive::DriveTrain dt = drive::DriveTrain(motorL, motorR, encoderL, encoderR, gyro);
+    
+    dt.driveStraightForDistance(5.0);
+    /*
     double speed = 0.25;
     motorR.setSpeed(speed);
     motorL.setSpeed(speed);
@@ -43,12 +50,13 @@ int main() {
     printf("Right encoder reads: %f",  encoderR.getDistance());
     motorR.stop();
     motorL.stop();
-    */
+   */ 
 
-    firmware::Servo servo = firmware::Servo(0);
+    /*firmware::Servo servo = firmware::Servo(0);
     servo.setServoPosition(-90.0);
     std::chrono::milliseconds sleep_time(10000);
     std::this_thread::sleep_for(sleep_time);
     servo.setServoPosition(90.0);
+    */
 }
 

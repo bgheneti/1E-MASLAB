@@ -41,7 +41,7 @@ namespace firmware
     // Spawn a new thread to continuously poll the encoder
     void Encoder::startPolling() {
         running = true;
-	std::thread thr(&Encoder::poll, this);
+        std::thread thr(&Encoder::poll, this);
         std::swap(thr, runner);
     }
 

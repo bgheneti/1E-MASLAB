@@ -3,6 +3,7 @@
 
 #include "../include/drive_ctrl.h"
 #include <sys/time.h>
+#include <chrono>
 namespace drive {
 
     DriveTrain::DriveTrain(firmware::Motor *leftMotor, 
@@ -73,11 +74,11 @@ namespace drive {
             bias = -SPEED;
         }
         driving = true;
-        maintainSpeeds();
+        std::thread maintainSpeedThread(maintainSpeeds, this);
 
-	struct timeval currentTime;
-	gettimeofday(&currentTime, NULL);
-	double integral = 0;
+        struct timeval currentTime;
+        gettimeofday(&currentTime, NULL);
+        double integral = 0;
 	
         while(driving) {
             speedLock.lock();
@@ -90,7 +91,8 @@ namespace drive {
             double derivative = gyro->getAngularV();
             diff = P*delta + I*integral + D*derivative;
             speedLock.unlock();
-	}
+        }
+        maintainSpeedThread.join();
     }
 
     // Get the robot to turn. If direction is negative, turn left;
@@ -102,8 +104,11 @@ namespace drive {
     // Have the robot move straight until some point. If distance > 0,
     // go forward, otherwise go backward
     void DriveTrain::straightForDistance(double distance) {
-        straight(distance);
-        
+        std::thread straightThread(straight, this, distance);
+        std::chrono::milliseconds sleep_time(5000);
+        std::this_thread::sleep_for(sleep_time);
+        driving = false;
+        straightThread.join(); 
     }
             
     // Have the robot turn for some number of degrees. If degrees
