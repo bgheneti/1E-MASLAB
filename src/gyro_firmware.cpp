@@ -50,7 +50,6 @@ namespace firmware{
 		    if(biasCalcRuns>0){
 		        bias+= -0.001 * msf * ((rf / 80.0) / totalBiasCalcRuns);
 		        biasCalcRuns--;
-		        printf("msf: %f",msf);
 		    }
 		    else{
 		      double newAngularVelocity= -0.001 * msf * (rf / 80.0)-bias;
@@ -92,6 +91,7 @@ namespace firmware{
 
     void Gyro::stopPoll(){
 	running=0;
+	runner.join();
     }
 
     void Gyro::zeroAngle(){

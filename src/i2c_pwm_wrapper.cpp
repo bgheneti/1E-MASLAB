@@ -31,8 +31,6 @@ namespace utils {
         assert(0.0 <= duty && duty <= 1.0);
         int on = (int) (4095.0*duty);
 
-        std::cout << on << std::endl;
-
         writeBuf[0] = 6 + 4*outputPin;
         writeBuf[1] = 0x00; // ON LSB
         writeBuf[2] = 0x00; // ON MSB

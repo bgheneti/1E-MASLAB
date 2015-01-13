@@ -4,6 +4,7 @@
 #include <cassert>
 #include <cmath>
 #include <thread>
+#include <iostream>
 
 #include "../include/encoder_firmware.h"
 

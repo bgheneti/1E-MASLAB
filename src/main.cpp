@@ -10,6 +10,7 @@
 #include "../include/encoder_firmware.h"
 #include "../include/servo_firmware.h"
 #include "../include/i2c_pwm_wrapper.h"
+#include "../include/drive_ctrl.h"
 
 int running = 1;
 
@@ -23,19 +24,23 @@ void sig_handler(int signo) {
 int main() {
     signal(SIGINT, sig_handler);
     // Motor setup
-    firmware::Motor motorR = firmware::Motor(9, 8);
-    firmware::Motor motorL = firmware::Motor(3, 2);
+    firmware::Motor motorR(9, 8);
+    firmware::Motor motorL(3, 2);
 
     // Encoder setup
-    firmware::Encoder encoderL = firmware::Encoder(4, 5);
-    firmware::Encoder encoderR = firmware::Encoder(6, 7);
+    firmware::Encoder encoderL(4, 5);
+    encoderL.startPolling();
+    firmware::Encoder encoderR(6, 1);
+    encoderR.startPolling();
 
     // Gyro setup
-    firmware::Gyro gyro = firmware::Gyro(10);
-
-    drive::DriveTrain dt = drive::DriveTrain(motorL, motorR, encoderL, encoderR, gyro);
-    
-    dt.driveStraightForDistance(5.0);
+    firmware::Gyro gyro(10);
+    gyro.startPoll();
+    drive::DriveTrain dt(&motorL, &motorR, &encoderL, &encoderR, &gyro);
+    dt.straightForDistance(5.0);
+    encoderL.stopPolling();
+    encoderR.stopPolling();
+    gyro.stopPoll();
     /*
     double speed = 0.25;
     motorR.setSpeed(speed);
