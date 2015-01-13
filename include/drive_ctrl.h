@@ -11,7 +11,7 @@
 #include <time.h>
 #include <cmath>
 
-#define SPEED .5
+#define SPEED .03
 #define P 0
 #define I 0
 #define D 0
@@ -25,30 +25,15 @@ namespace drive {
             firmware::Encoder *leftEncoder;
             firmware::Encoder *rightEncoder;
             firmware::Gyro *gyro;
-            std::mutex speedLock;
-            double bias;  // The speed the robot should move forward at.
-            double diff;  // The difference between the motors and the bias
-            bool driving;  // Indicates whether the drive module should be
-                           // active, ie, should be maintaining bias and diffs.
-            // Set the speed to the requested speed if it is not different
-            // from the current speed by more than .2. Otherwise change the
-            // speed by .2 in the correct direction.
-            void trySetMotorSpeed(double requestedSpeed, firmware::Motor motor);
 
-            // Maintain the bias and the diff in the left and right motors.
-            // Don't let the speeds change abruptly.
-            void maintainSpeeds();
-
+            double bias;
+            double diff;
+            bool driving;
             // Zero the encoders and gyro
             void resetSensors();
 
-            // Move forward if direction is positive, backward if direction
-            // is negative
-            void straight(int direction);
-            
-            // Get the robot to turn. If direction is negative, turn left;
-            // if positive turn right.
-            void turn(int direction);
+            // Correct the heading based on the gyro reading
+            void correctHeading();
 
         public:
             // Constructor for drive, specifying the motors, encoders, and
