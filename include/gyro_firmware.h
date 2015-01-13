@@ -14,7 +14,7 @@ namespace firmware{
 	    int running;
 	    std::thread runner;
             int zero;
-	    const double newRateWeight;
+	    const double newRateConstant;
 	    void poll();
         public:
 	    //Creates a new gyro object that has a slave select pin
