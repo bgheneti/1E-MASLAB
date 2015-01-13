@@ -1,6 +1,7 @@
 // This file contains functions to control the drive train of the
 // robot.
 
+#include "../include/drive_ctrl.h"
 namespace drive {
 
     DriveTrain::DriveTrain(firmware::Motor leftMotor, 
@@ -22,16 +23,16 @@ namespace drive {
     // Return requestedSpeed if it doesn't change the current speed by more
     // than .2. Otherwise change the speed by .2 in the correct direction.
     void DriveTrain::trySetMotorSpeed(double requestedSpeed, firmware::Motor motor) {
-        if(fabs(requestedSpeed) > 1) {return;}
+	double currentSpeed = motor.getSpeed();
         double diff = requestedSpeed - motor.getSpeed();
     
-        if(fabs(diff) < .2) {
+        if(std::abs(diff) < .2 && std::abs(requestedSpeed) < 1.0) {
             motor.setSpeed(requestedSpeed);
         } else {
-            if(diff > 0) {
+            if(diff > 0 && currentSpeed <= .8) {
                 motor.setSpeed(currentSpeed + .2);
-            } else {
-                motor.setSpeed(curentSpeed - .2);
+            } else if(diff < 0 && currentSpeed >= -.8) {
+                motor.setSpeed(currentSpeed - .2);
             }
         }
     }
@@ -71,29 +72,26 @@ namespace drive {
         driving = true;
         maintainSpeeds();
 
-        time_t currentTime = timer(NULL);
-
+        time_t currentTime = std::chrono::timer(NULL);
+	double integral = 0;
+	
         while(driving) {
             speedLock.lock();
             // PID Control
             double delta = -gyro.getAngle();
-            time_t nextTime = timer(NULL);
+            time_t nextTime = std::chrono::timer(NULL);
             double dT = difftime(nextTime, currentTime);
             currentTime = nextTime;
-            double integral += delta * dT;
+            integral += delta * dT;
             double derivative = gyro.getAngularV();
             diff = P*delta + I*integral + D*derivative;
             speedLock.unlock();
+	}
     }
 
     // Get the robot to turn. If direction is negative, turn left;
     // if positive turn right.
     void DriveTrain::turn(int direction) {
-
-    }
-
-    // Stop the robot, decelerating to avoid skidding.
-    void stop() {
 
     }
 
@@ -108,9 +106,5 @@ namespace drive {
     void DriveTrain::turnForDegrees(double degrees) {
 
     }
-
-                           
-
-
 
 }

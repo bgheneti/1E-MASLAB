@@ -7,9 +7,9 @@
 #include "../include/encoder_firmware.h"
 #include "../include/motor_firmware.h"
 #include "../include/gyro_firmware.h"
-#include "point.h"
 #include <mutex>
 #include <ctime>
+#include <cmath>
 
 #define SPEED .5
 #define P 0
@@ -33,7 +33,7 @@ namespace drive {
             // Set the speed to the requested speed if it is not different
             // from the current speed by more than .2. Otherwise change the
             // speed by .2 in the correct direction.
-            double getNewSpeed(double requestedSpeed, double currentSpeed);
+            void trySetMotorSpeed(double requestedSpeed, firmware::Motor motor);
 
             // Maintain the bias and the diff in the left and right motors.
             // Don't let the speeds change abruptly.
@@ -56,7 +56,7 @@ namespace drive {
         public:
             // Constructor for drive, specifying the motors, encoders, and
             // gyroscope.
-            Drive(firmware::Motor leftMotor, 
+            DriveTrain(firmware::Motor leftMotor, 
                   firmware::Motor rightMotor,
                   firmware::Encoder leftEncoder, 
                   firmware::Encoder rightEncoder,
@@ -64,13 +64,13 @@ namespace drive {
 
             // Move straight for some distance. If distance > 0, forward
             // otherwise backward.
-            void straightForDistance(double distance)
+            void straightForDistance(double distance);
 
             // Have the robot turn for some number of degrees. If degrees
             // is negative, turn left; if positive turn right.
             void turnForDegrees(double degrees);
 
-    }
+    };
 
 
 }

@@ -1,7 +1,8 @@
 #ifndef INCLUDE_POINT_H_
 #define INCLUDE_POINT_H_
-#include <cmath.h>
-namespace utils {
+#include <cmath>
+
+namespace maslab_utils {
     class Point {
         private:
             const float x;
