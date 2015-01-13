@@ -1,6 +1,6 @@
 // This file contains functions to control the drive train of the
 // robot.
-
+#include <chronos>
 namespace drive {
 
     DriveTrain::DriveTrain(firmware::Motor leftMotor, 
@@ -49,6 +49,9 @@ namespace drive {
             DriveTrain::trySetMotorSpeed(requestedRightSpeed, rightMotor);
 
             speedLock.unlock();
+            std::chrono::milliseconds sleep_time(2000);
+            std::this_thread::sleep_for(sleep_time);
+ 
         }
     }
 
@@ -84,6 +87,7 @@ namespace drive {
             double derivative = gyro.getAngularV();
             diff = P*delta + I*integral + D*derivative;
             speedLock.unlock();
+        }
     }
 
     // Get the robot to turn. If direction is negative, turn left;
@@ -92,15 +96,12 @@ namespace drive {
 
     }
 
-    // Stop the robot, decelerating to avoid skidding.
-    void stop() {
-
-    }
 
     // Have the robot move straight until some point. If distance > 0,
     // go forward, otherwise go backward
     void DriveTrain::straightForDistance(double distance) {
-
+        straight(distance);
+        
     }
             
     // Have the robot turn for some number of degrees. If degrees

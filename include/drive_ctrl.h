@@ -50,9 +50,6 @@ namespace drive {
             // if positive turn right.
             void turn(int direction);
 
-            // Stop the robot, decelerating to avoid skidding.
-            void stop();
-
         public:
             // Constructor for drive, specifying the motors, encoders, and
             // gyroscope.
