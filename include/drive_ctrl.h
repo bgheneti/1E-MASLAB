@@ -27,13 +27,10 @@ namespace drive {
             firmware::Gyro *gyro;
 
             double bias;
-            double diff;
+            double power;
             bool driving;
             // Zero the encoders and gyro
             void resetSensors();
-
-            // Correct the heading based on the gyro reading
-            void correctHeading();
 
         public:
             // Constructor for drive, specifying the motors, encoders, and
