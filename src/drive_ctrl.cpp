@@ -50,6 +50,9 @@ namespace drive {
             DriveTrain::trySetMotorSpeed(requestedRightSpeed, *rightMotor);
 
             speedLock.unlock();
+            std::chrono::milliseconds sleep_time(2000);
+            std::this_thread::sleep_for(sleep_time);
+ 
         }
     }
 
@@ -99,7 +102,8 @@ namespace drive {
     // Have the robot move straight until some point. If distance > 0,
     // go forward, otherwise go backward
     void DriveTrain::straightForDistance(double distance) {
-
+        straight(distance);
+        
     }
             
     // Have the robot turn for some number of degrees. If degrees
