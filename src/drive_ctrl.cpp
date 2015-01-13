@@ -44,7 +44,7 @@ namespace drive {
         leftMotor->setSpeed(bias);
         rightMotor->setSpeed(bias);
         
-        while(encoderL.getDistance() < std::abs(distance)) {
+        while(leftEncoder->getDistance() < std::abs(distance)) {
             usleep(100000);
         }
      	leftMotor->setSpeed(0.0);
