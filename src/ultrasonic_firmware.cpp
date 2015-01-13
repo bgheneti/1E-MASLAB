@@ -38,6 +38,6 @@ namespace firmware{
     }
     
     //calculate distance
-    return ((double)(stop-start))/CLOCKS_PER_SEC*34000;
+    return ((double)(stop-start))/CLOCKS_PER_SEC*34000/2;
   }
 }
