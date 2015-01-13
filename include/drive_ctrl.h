@@ -8,7 +8,7 @@
 #include "../include/motor_firmware.h"
 #include "../include/gyro_firmware.h"
 #include <mutex>
-#include <ctime>
+#include <time.h>
 #include <cmath>
 
 #define SPEED .5
@@ -20,11 +20,11 @@ namespace drive {
     
     class DriveTrain {
         private:
-            firmware::Motor leftMotor;
-            firmware::Motor rightMotor;
-            firmware::Encoder leftEncoder;
-            firmware::Encoder rightEncoder;
-            firmware::Gyro gyro;
+            firmware::Motor *leftMotor;
+            firmware::Motor *rightMotor;
+            firmware::Encoder *leftEncoder;
+            firmware::Encoder *rightEncoder;
+            firmware::Gyro *gyro;
             std::mutex speedLock;
             double bias;  // The speed the robot should move forward at.
             double diff;  // The difference between the motors and the bias
@@ -56,11 +56,11 @@ namespace drive {
         public:
             // Constructor for drive, specifying the motors, encoders, and
             // gyroscope.
-            DriveTrain(firmware::Motor leftMotor, 
-                  firmware::Motor rightMotor,
-                  firmware::Encoder leftEncoder, 
-                  firmware::Encoder rightEncoder,
-                  firmware::Gyro gyro);
+            DriveTrain(firmware::Motor *leftMotor, 
+                  firmware::Motor *rightMotor,
+                  firmware::Encoder *leftEncoder, 
+                  firmware::Encoder *rightEncoder,
+                  firmware::Gyro *gyro);
 
             // Move straight for some distance. If distance > 0, forward
             // otherwise backward.

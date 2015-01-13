@@ -2,19 +2,19 @@
 // robot.
 
 #include "../include/drive_ctrl.h"
+#include <sys/time.h>
 namespace drive {
 
-    DriveTrain::DriveTrain(firmware::Motor leftMotor, 
-                           firmware::Motor rightMotor,
-                           firmware::Encoder leftEncoder,
-                           firmware::Encoder rightEncoder,
-                           firmware::Gyro gyro) {
-        
-        leftMotor = leftMotor;
-        rightMotor = rightMotor;
-        leftEncoder = leftEncoder;
-        rightEncoder = rightEncoder;
-        gyro = gyro;
+    DriveTrain::DriveTrain(firmware::Motor *leftMotor, 
+                           firmware::Motor *rightMotor,
+                           firmware::Encoder *leftEncoder,
+                           firmware::Encoder *rightEncoder,
+                           firmware::Gyro *gyro) {
+	leftMotor = leftMotor;
+	rightMotor = rightMotor;
+	leftEncoder = leftEncoder;
+	rightEncoder = rightEncoder;
+	gyro = gyro;
         bias = 0;
         diff = 0;
         driving = false;
@@ -46,17 +46,17 @@ namespace drive {
             double requestedLeftSpeed = bias + diff;
             double requestedRightSpeed = bias - diff;
 
-            DriveTrain::trySetMotorSpeed(requestedLeftSpeed, leftMotor);
-            DriveTrain::trySetMotorSpeed(requestedRightSpeed, rightMotor);
+            DriveTrain::trySetMotorSpeed(requestedLeftSpeed, *leftMotor);
+            DriveTrain::trySetMotorSpeed(requestedRightSpeed, *rightMotor);
 
             speedLock.unlock();
         }
     }
 
     void DriveTrain::resetSensors() {
-        leftEncoder.resetNumTicks();
-        rightEncoder.resetNumTicks();
-        gyro.zeroAngle();
+        leftEncoder->resetNumTicks();
+        rightEncoder->resetNumTicks();
+        gyro->zeroAngle();
     
     }
 
@@ -72,18 +72,19 @@ namespace drive {
         driving = true;
         maintainSpeeds();
 
-        time_t currentTime = std::chrono::timer(NULL);
+	struct timeval currentTime;
+	gettimeofday(&currentTime, NULL);
 	double integral = 0;
 	
         while(driving) {
             speedLock.lock();
             // PID Control
-            double delta = -gyro.getAngle();
-            time_t nextTime = std::chrono::timer(NULL);
-            double dT = difftime(nextTime, currentTime);
-            currentTime = nextTime;
+            double delta = -gyro->getAngle();
+            gettimeofday(&currentTime, NULL);
+            double dT = ((double) currentTime.tv_sec)*1000.0 + 
+			((double) currentTime.tv_usec)/1000.0;
             integral += delta * dT;
-            double derivative = gyro.getAngularV();
+            double derivative = gyro->getAngularV();
             diff = P*delta + I*integral + D*derivative;
             speedLock.unlock();
 	}
