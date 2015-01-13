@@ -33,20 +33,22 @@ namespace drive {
 
     // Get the robot to start moving straight. Forward if direction > 0,
     // otherwise backward
-    void DriveTrain::straightForDistance(double direction) {
+    void DriveTrain::straightForDistance(double distance) {
 
         resetSensors();
-        if(direction > 0) {
+        if(distance > 0) {
             bias = SPEED;
         } else {
             bias = -SPEED;
         }
-	leftMotor->setSpeed(bias);
-	rightMotor->setSpeed(bias);
-
-        usleep(2000000); 
-	leftMotor->setSpeed(0.0);
-	rightMotor->setSpeed(0.0);
+        leftMotor->setSpeed(bias);
+        rightMotor->setSpeed(bias);
+        
+        while(encoderL.getDistance() < std::abs(distance)) {
+            usleep(100000);
+        }
+     	leftMotor->setSpeed(0.0);
+   	    rightMotor->setSpeed(0.0);
         /*struct timeval currentTime;
         gettimeofday(&currentTime, NULL);
         double integral = 0;
