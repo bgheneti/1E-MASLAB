@@ -11,7 +11,7 @@
 #include <time.h>
 #include <cmath>
 
-#define SPEED .03
+#define SPEED .1
 #define P 0
 #define I 0
 #define D 0
