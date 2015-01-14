@@ -24,15 +24,21 @@ void sig_handler(int signo) {
 int main() {
     signal(SIGINT, sig_handler);
     // Motor setup
-    firmware::Motor motorR(9, 8);
-    firmware::Motor motorL(3, 2);
+/*    firmware::Motor motorR(9, 8);
+    firmware::Motor motorL(3, 2); */
 
     // Encoder setup
-    firmware::Encoder encoderL(4, 5);
+    firmware::Encoder encoderL(2, 3);
     encoderL.startPolling();
-    firmware::Encoder encoderR(6, 1);
+    firmware::Encoder encoderR(4, 5);
     encoderR.startPolling();
-
+    std::cout << "Start moving the wheels" << std::endl;
+    usleep(10000000);
+    std::cout << encoderL.getDistance() << std::endl;
+    std::cout << encoderR.getDistance() << std::endl;
+    encoderL.stopPolling();
+    encoderR.stopPolling();
+/*
     // Gyro setup
     firmware::Gyro gyro(10);
     gyro.startPoll();
@@ -44,6 +50,7 @@ int main() {
     encoderL.stopPolling();
     encoderR.stopPolling();
     gyro.stopPoll();
+    */
     /*
     double speed = 0.25;
     motorR.setSpeed(speed);
