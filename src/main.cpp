@@ -32,17 +32,16 @@ int main() {
     encoderL.startPolling();
     firmware::Encoder encoderR(4, 5);
     encoderR.startPolling();
-    std::cout << "Start moving the wheels" << std::endl;
-    usleep(10000000);
-    std::cout << encoderL.getDistance() << std::endl;
-    std::cout << encoderR.getDistance() << std::endl;
-    encoderL.stopPolling();
-    encoderR.stopPolling();
-/*
+
     // Gyro setup
     firmware::Gyro gyro(10);
     gyro.startPoll();
-    drive::DriveTrain dt(&motorL, &motorR, &encoderL, &encoderR, &gyro);
+    usleep(5000000);
+    std::cout << gyro.getAngle() << std::endl;
+    std::cout << gyro.getAngularV() << std::endl;
+    gyro.stopPoll();
+/*    drive::DriveTrain dt(&motorL, &motorR, &encoderL, &encoderR, &gyro);
+    
     std::cout << "running" << std::endl;
     dt.straightForDistance(.25);
     std::cout << "running" << std::endl;
@@ -59,8 +58,8 @@ int main() {
     encoderR.startPolling();
     std::chrono::milliseconds sleep_time(10000);
     std::this_thread::sleep_for(sleep_time);
-    encoderL.stopPolling();
-    encoderR.stopPolling();
+*/    encoderL.stopPolling(); 
+    encoderR.stopPolling(); /*
     printf("Left encoder reads: %f",  encoderL.getDistance());
     printf("Right encoder reads: %f",  encoderR.getDistance());
     motorR.stop();
