@@ -7,8 +7,8 @@ namespace firmware {
     class Motor {
         private:
             double speed;
-            mraa::Pwm pwm;
-            mraa::Gpio dir;
+            utils::i2cPwmWrapper pwm;
+            utils::i2cPwmWrapper dir;
         public:
             // Creates a new motor object that has a pwm pin and a gpio direction pin
             Motor(int pwmPin, int dirPin);

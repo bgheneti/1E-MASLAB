@@ -24,8 +24,8 @@ void sig_handler(int signo) {
 int main() {
     signal(SIGINT, sig_handler);
     // Motor setup
-/*    firmware::Motor motorR(9, 8);
-    firmware::Motor motorL(3, 2); */
+    firmware::Motor motorR(2, 3);
+    firmware::Motor motorL(0, 1); 
 
     // Encoder setup
     firmware::Encoder encoderL(2, 3);
@@ -36,9 +36,6 @@ int main() {
     // Gyro setup
     firmware::Gyro gyro(10);
     gyro.startPoll();
-    usleep(5000000);
-    std::cout << gyro.getAngle() << std::endl;
-    std::cout << gyro.getAngularV() << std::endl;
     gyro.stopPoll();
 /*    drive::DriveTrain dt(&motorL, &motorR, &encoderL, &encoderR, &gyro);
     

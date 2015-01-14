@@ -10,8 +10,6 @@ namespace firmware {
     // Initialize a new motor. Provide the pin for the pwm signal and the dir signal
     Motor::Motor(int pwmPin, int dirPin) : pwm(pwmPin), dir(dirPin), speed(0.0) {
 	pwm.write(0.0);
-        pwm.enable(true);
-	dir.dir(mraa::DIR_OUT);
 	dir.write(0);
     }
 
@@ -20,13 +18,12 @@ namespace firmware {
     void Motor::setSpeed(double newSpeed) {
         assert(-1.0 <= newSpeed && newSpeed <= 1.0);
         if (newSpeed > 0) {
-            dir.write(0);
+            dir.write(0.0);
         } else {
-            dir.write(1);
+            dir.write(1.0);
         }
         pwm.write(fabs(newSpeed));
         speed = newSpeed;
-	std::cout << "set speed to " << speed << std::endl;
     }
 
     // Abruptly stops the motor (sets its speed to 0)
