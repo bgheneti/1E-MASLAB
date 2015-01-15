@@ -18,9 +18,9 @@ namespace firmware {
     void Motor::setSpeed(double newSpeed) {
         assert(-1.0 <= newSpeed && newSpeed <= 1.0);
         if (newSpeed > 0) {
-            dir.write(0.0);
-        } else {
             dir.write(1.0);
+        } else {
+            dir.write(0.0);
         }
         pwm.write(fabs(newSpeed));
         speed = newSpeed;

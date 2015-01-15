@@ -7,11 +7,11 @@
 #include <iostream>
 namespace drive {
 
-    DriveTrain::DriveTrain(firmware::Motor *leftMotor, 
-                           firmware::Motor *rightMotor,
-                           firmware::Encoder *leftEncoder,
-                           firmware::Encoder *rightEncoder,
-                           firmware::Gyro *gyro) : leftMotor(leftMotor),
+    DriveTrain::DriveTrain(firmware::Motor &leftMotor, 
+                           firmware::Motor &rightMotor,
+                           firmware::Encoder &leftEncoder,
+                           firmware::Encoder &rightEncoder,
+                           firmware::Gyro &gyro) : leftMotor(leftMotor),
                                                    rightMotor(rightMotor),
                                                    leftEncoder(leftEncoder),
                                                    rightEncoder(rightEncoder),
@@ -21,9 +21,9 @@ namespace drive {
                                                    driving(false) {}
 
     void DriveTrain::resetSensors() {
-        leftEncoder->resetNumTicks();
-        rightEncoder->resetNumTicks();
-        gyro->zeroAngle();
+        leftEncoder.resetNumTicks();
+        rightEncoder.resetNumTicks();
+        gyro.zeroAngle();
     
     }
 
@@ -33,6 +33,8 @@ namespace drive {
     void DriveTrain::straightForDistance(double distance) {
         struct timeval currentTime;
         gettimeofday(&currentTime, NULL);
+	double currentMS = ((double)currentTime.tv_sec)*1000.0 +
+			   ((double)currentTime.tv_usec)/1000.0;
         double integral = 0;
         resetSensors();
         if(distance > 0) {
@@ -40,16 +42,23 @@ namespace drive {
         } else {
             bias = -SPEED;
         }
-        leftMotor->setSpeed(bias);
-        rightMotor->setSpeed(bias);
-        
-        while(leftEncoder->getDistance() < std::abs(distance)) {
-            double diff = -gyro->getAngle();
-            double dT = ((double)currentTime.tv_sec)*1000.0 +
+        leftMotor.setSpeed(bias);
+        rightMotor.setSpeed(bias);
+        while(leftEncoder.getDistance() < std::abs(distance)) {
+            double diff = -gyro.getAngle();
+	std::cout << "diff is: " << diff << std::endl;
+	    gettimeofday(&currentTime, NULL);
+	    double newCurrentMS = ((double)currentTime.tv_sec)*1000.0 +
                         ((double)currentTime.tv_usec)/1000.0;
+	    double dT = newCurrentMS - currentMS;
+	    currentMS = newCurrentMS;
+	std::cout << "current time is: " << dT << std::endl;
             integral += diff * dT;
-            double derivative = gyro->getAngularV();
+	std::cout << "integral is: " << integral << std::endl;
+            double derivative = gyro.getAngularV();
             power = P*diff + I*integral + D*derivative;
+	    std::cout << "power is: " << power << std::endl;
+	    std::cout << "derivative is: " << derivative << std::endl;
             double leftMotorSpeed = bias - power;
             double rightMotorSpeed = bias + power;
             if(std::abs(leftMotorSpeed) > .3) {
@@ -58,12 +67,12 @@ namespace drive {
             if(std::abs(rightMotorSpeed) > .3) {
                 rightMotorSpeed = rightMotorSpeed < 0 ? -.3: .3;
             }
-            leftMotor->setSpeed(leftMotorSpeed);
-            rightMotor->setSpeed(rightMotorSpeed);
-            usleep(100000);
+            leftMotor.setSpeed(leftMotorSpeed);
+            rightMotor.setSpeed(rightMotorSpeed);
+            usleep(50000);
         }
-     	leftMotor->setSpeed(0.0);
-   	    rightMotor->setSpeed(0.0);
+     	leftMotor.setSpeed(0.0);
+   	    rightMotor.setSpeed(0.0);
     }
 
             

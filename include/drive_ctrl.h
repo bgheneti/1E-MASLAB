@@ -12,19 +12,19 @@
 #include <cmath>
 
 #define SPEED .1
-#define P 1
-#define I 0
-#define D 0
+#define P .02
+#define I 0.00002
+#define D -.4
 
 namespace drive {
     
     class DriveTrain {
         private:
-            firmware::Motor *leftMotor;
-            firmware::Motor *rightMotor;
-            firmware::Encoder *leftEncoder;
-            firmware::Encoder *rightEncoder;
-            firmware::Gyro *gyro;
+            firmware::Motor &leftMotor;
+            firmware::Motor &rightMotor;
+            firmware::Encoder &leftEncoder;
+            firmware::Encoder &rightEncoder;
+            firmware::Gyro &gyro;
 
             double bias;
             double power;
@@ -35,11 +35,11 @@ namespace drive {
         public:
             // Constructor for drive, specifying the motors, encoders, and
             // gyroscope.
-            DriveTrain(firmware::Motor *leftMotor, 
-                  firmware::Motor *rightMotor,
-                  firmware::Encoder *leftEncoder, 
-                  firmware::Encoder *rightEncoder,
-                  firmware::Gyro *gyro);
+            DriveTrain(firmware::Motor &leftMotor, 
+                  firmware::Motor &rightMotor,
+                  firmware::Encoder &leftEncoder, 
+                  firmware::Encoder &rightEncoder,
+                  firmware::Gyro &gyro);
 
             // Move straight for some distance. If distance > 0, forward
             // otherwise backward.
