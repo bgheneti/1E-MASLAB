@@ -26,12 +26,12 @@ int main() {
     // Motor setup
     firmware::Motor motorR(0, 1);
     firmware::Motor motorL(2, 3); 
-    motorR.setSpeed(.2);
+/*    motorR.setSpeed(.2);
     motorL.setSpeed(.2);
     usleep(5000000);
     motorR.setSpeed(0.0);
     motorL.setSpeed(0.0);
-
+*/
 
     
     // Encoder setup
@@ -54,7 +54,7 @@ int main() {
     encoderR.stopPolling();
     gyro.stopPoll();
 
-
+/*
     double speed = 0.25;
     motorR.setSpeed(speed);
     motorL.setSpeed(speed);
@@ -68,15 +68,15 @@ int main() {
     printf("Right encoder reads: %f",  encoderR.getDistance());
     motorR.stop();
     motorL.stop();
-    
+ */   
 
-    firmware::Servo servo = firmware::Servo(0);
+  /*  firmware::Servo servo = firmware::Servo(0);
     servo.setServoPosition(-40.0);
     std::chrono::milliseconds sleep_time(10000);
     std::this_thread::sleep_for(sleep_time);
     std::cout << "hi" << std::endl;
     servo.setServoPosition(90.0);
-    
+   */ 
    
 }
 

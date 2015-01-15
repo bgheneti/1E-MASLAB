@@ -78,6 +78,7 @@ namespace firmware{
             spi.bitPerWord(32);
 	    std::thread thr(&Gyro::poll, this);
 	    std::swap(thr, runner);
+	    runner.detach();
         }
     }
 
@@ -91,7 +92,6 @@ namespace firmware{
 
     void Gyro::stopPoll(){
 	running=0;
-	runner.join();
     }
 
     void Gyro::zeroAngle(){
