@@ -4,8 +4,7 @@
 
 namespace utils {
 
-    I2cPwmWrapper::I2cPwmWrapper(int outputPin) : i2c(BUS_NUMBER) {
-        outputPin = outputPin;
+    I2cPwmWrapper::I2cPwmWrapper(int outputPin) : i2c(BUS_NUMBER), outputPin(outputPin) {
 
         writeBuf[0] = 0x00; // Write to MODE 1 Register;
         writeBuf[1] = 1 << 4; // Enale Sleep Mode
@@ -13,6 +12,7 @@ namespace utils {
         i2c.address(SHIELD_I2C_ADDR);
         i2c.write(writeBuf, 2);
 
+	usleep(10000);
         writeBuf[0] = 0xFE; // Write Prescalar Register
         writeBuf[1] = 0xA3; // Set pwm frequency to ~40 Hz
 
