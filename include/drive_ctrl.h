@@ -13,7 +13,7 @@
 
 #define SPEED .1
 #define P .01
-#define I 0.0000001
+#define I 0.000001
 #define D 0.0
 
 namespace drive {

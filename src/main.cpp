@@ -51,7 +51,7 @@ int main() {
     drive::DriveTrain dt(motorL, motorR, encoderL, encoderR, gyro);
     
     std::cout << "running" << std::endl;
-    dt.straightForDistance(.5);
+    dt.straightForDistance(.25);
     std::cout << "running" << std::endl;
 
     encoderL.stopPolling();
