@@ -32,7 +32,6 @@ namespace drive {
             // Zero the encoders and gyro
             void resetSensors();
 
-            void pidControl(double distance, double heading);
 
         public:
             // Constructor for drive, specifying the motors, encoders, and
