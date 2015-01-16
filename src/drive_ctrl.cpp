@@ -29,7 +29,7 @@ namespace drive {
 
 
     // Control the robot's motion.
-    void DriveTrain::straightForDistance(double distance) {
+    void DriveTrain::straightForDistance(double distance, double heading) {
         struct timeval currentTime;
         gettimeofday(&currentTime, NULL);
 	double currentMS = ((double)currentTime.tv_sec)*1000.0 +
@@ -45,21 +45,17 @@ namespace drive {
         }
         leftMotor.setSpeed(bias);
         rightMotor.setSpeed(bias);
-        while(leftEncoder.getDistance() < std::abs(distance)) { 
-            double diff = - gyro.getAngle();
-//	std::cout << "diff is: " << diff << std::endl;
-	    gettimeofday(&currentTime, NULL);
-	    double newCurrentMS = ((double)currentTime.tv_sec)*1000.0 +
-                        ((double)currentTime.tv_usec)/1000.0;
-	    double dT = newCurrentMS - currentMS;
-	    currentMS = newCurrentMS;
-//	std::cout << "current time is: " << dT << std::endl;
+        while(leftEncoder.getDistance() < std::abs(distance) ||
+              (distance < .0001 && std::abs(heading - gyro.getAngle) < 2.0 )) { 
+            double diff = heading - gyro.getAngle();
+            gettimeofday(&currentTime, NULL);
+            double newCurrentMS = ((double)currentTime.tv_sec)*1000.0 +
+                                  ((double)currentTime.tv_usec)/1000.0;
+            double dT = newCurrentMS - currentMS;
+            currentMS = newCurrentMS;
             integral += diff * dT;
-//	std::cout << "integral is: " << integral << std::endl;
             double derivative = gyro.getAngularV();
             power = P*diff + I*integral + D*derivative;
-//	    std::cout << "power is: " << power << std::endl;
-//	    std::cout << "derivative is: " << derivative << std::endl;
             double leftMotorSpeed = bias - power;
             double rightMotorSpeed = bias + power;
             if(std::abs(leftMotorSpeed) > .3) {
