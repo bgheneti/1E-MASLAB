@@ -28,9 +28,8 @@ namespace drive {
     }
 
 
-    // Get the robot to start moving straight. Forward if direction > 0,
-    // otherwise backward
-    void DriveTrain::straightForDistance(double distance) {
+    // Control the robot's motion.
+    void DriveTrain::pidControl(double distance, double heading) {
         struct timeval currentTime;
         gettimeofday(&currentTime, NULL);
 	double currentMS = ((double)currentTime.tv_sec)*1000.0 +
@@ -39,13 +38,16 @@ namespace drive {
         resetSensors();
         if(distance > 0) {
             bias = SPEED;
-        } else {
+        } else if(distance < 0) {
             bias = -SPEED;
+        } else {
+            bias = 0;
         }
         leftMotor.setSpeed(bias);
         rightMotor.setSpeed(bias);
-        while(leftEncoder.getDistance() < std::abs(distance)) {
-            double diff = -gyro.getAngle();
+        while(leftEncoder.getDistance() < std::abs(distance) ||
+              std::abs(heading) < std::abs(gyro.getAngle())) {
+            double diff = heading - gyro.getAngle();
 	std::cout << "diff is: " << diff << std::endl;
 	    gettimeofday(&currentTime, NULL);
 	    double newCurrentMS = ((double)currentTime.tv_sec)*1000.0 +
@@ -75,11 +77,16 @@ namespace drive {
    	    rightMotor.setSpeed(0.0);
     }
 
+    // Get the robot to start moving straight. Forward if direction > 0,
+    // otherwise backward
+    void DriveTrain::straightForDistance(double distance) {
+        pidControl(distance, 0);
+    }
             
     // Have the robot turn for some number of degrees. If degrees
     // is negative, turn left; if positive turn right.
     void DriveTrain::turnForDegrees(double degrees) {
-
+        pidControl(0, degrees);
     }
 
 }
