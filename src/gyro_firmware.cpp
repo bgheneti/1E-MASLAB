@@ -25,8 +25,8 @@ namespace firmware{
 	double bias=0;
 	
 	double p=0; 
-	double q=.0006;
-	double r=0.0002;
+	double q=.001;
+	double r=0.0006;
 	double k;
 	angle=0;
 	while(running){
@@ -65,8 +65,10 @@ namespace firmware{
 		      angularVelocity += k * (newAngularVelocity - angularVelocity);
 			//angularVelocity = (-msf/newRateConstant)*(newAngularVelocity)+
 			//(1+msf/newRateConstant)*angularVelocity;
+		      p = (1 - k) * p;
 		      angle += angularVelocity;
 		      angle = fmod(angle,360);
+		      printf("total: %f\n",angle);
 		      if(angle > 180){
 			angle -= 360;
 		      }

@@ -49,9 +49,9 @@ int main() {
     firmware::Gyro gyro(10);
     gyro.startPoll();
     drive::DriveTrain dt(motorL, motorR, encoderL, encoderR, gyro);
-    
+    usleep(500000);
     std::cout << "running" << std::endl;
-    dt.straightForDistance(.25);
+    dt.straightForDistance(.5);
     std::cout << "running" << std::endl;
 
     encoderL.stopPolling();
