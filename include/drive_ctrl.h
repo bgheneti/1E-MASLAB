@@ -12,9 +12,9 @@
 #include <cmath>
 
 #define SPEED .1
-#define P .02
-#define I 0.00002
-#define D -.4
+#define P .01
+#define I 0.0000001
+#define D 0.0
 
 namespace drive {
     

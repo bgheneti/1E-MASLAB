@@ -26,6 +26,11 @@ int main() {
     // Motor setup
     firmware::Motor motorR(0, 1);
     firmware::Motor motorL(2, 3); 
+    firmware::Motor pickupMotor(4, 5);
+//    pickupMotor.setSpeed(-.25);
+//    usleep(5000000);
+//    pickupMotor.stop();
+
 /*    motorR.setSpeed(.2);
     motorL.setSpeed(.2);
     usleep(5000000);

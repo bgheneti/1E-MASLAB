@@ -1,5 +1,6 @@
 #include "../include/gyro_firmware.h"
 #include <unistd.h>
+#include <math.h>
 #include <stdint.h>
 #include <signal.h>
 #include <thread>
@@ -19,9 +20,14 @@ namespace firmware{
         writeBuf[3] = (sensorRead >> 24) & 0xff;
         struct timeval tv;
         int init = 0;
-	int biasCalcRuns=50;
+	int biasCalcRuns=200;
 	int totalBiasCalcRuns=biasCalcRuns;
 	double bias=0;
+	
+	double p=0; 
+	double q=.01;
+	double r=0.0002;
+	double k;
 	angle=0;
 	while(running){
 	    if(zero){
@@ -39,23 +45,34 @@ namespace firmware{
 	        // Sensor reading
 		short reading = (recvVal >> 10) & 0xffff;
 		if (init) {
-		    unsigned long long ms = (unsigned long long)(tv.tv_sec)*1000 + 
+		    unsigned long long ms = (unsigned long long)(tv.tv_sec) * 1000 + 
 		      (unsigned long long)(tv.tv_usec) / 1000;
 		    gettimeofday(&tv, NULL);
-		    ms -= (unsigned long long)(tv.tv_sec)*1000 +
+		    ms -= (unsigned long long)(tv.tv_sec) * 1000 +
 		      (unsigned long long)(tv.tv_usec) / 1000;
 		    int msi = (int)ms;
 		    float msf = (float)msi;
 		    float rf = (float) reading;
 		    if(biasCalcRuns>0){
-		        bias+= -0.001 * msf * ((rf / 80.0) / totalBiasCalcRuns);
+		        bias += -0.001 * msf * ((rf / 80.0) / totalBiasCalcRuns);
 		        biasCalcRuns--;
 		    }
 		    else{
-		      double newAngularVelocity= -0.001 * msf * (rf / 80.0)-bias;
-		      angularVelocity = (-msf/newRateConstant)*(newAngularVelocity)+
-			(1+msf/newRateConstant)*angularVelocity;
-		      angle+=angularVelocity;
+		      double newAngularVelocity= -0.001 * msf * (rf / 80.0) - bias;
+		      //printf("new: %f \n", newAngularVelocity);
+		      p = p + q;
+		      k = p / (p + r);
+		      angularVelocity += k * (newAngularVelocity - angularVelocity);
+			//angularVelocity = (-msf/newRateConstant)*(newAngularVelocity)+
+			//(1+msf/newRateConstant)*angularVelocity;
+		      angle += angularVelocity;
+		      angle = fmod(angle,360);
+		      if(angle > 180){
+			angle -= 360;
+		      }
+		      else if(angle < -180){
+			angle += 360;
+		      }
 		    }
 		}
 		else {
@@ -66,7 +83,7 @@ namespace firmware{
 	    else {
 		printf("No recv\n");
 	    }
-	    usleep(10*MS);
+	    usleep(2*MS);
 	}
     }
 
