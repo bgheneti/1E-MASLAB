@@ -31,6 +31,7 @@ namespace drive {
             bool driving;
             // Zero the encoders and gyro
             void resetSensors();
+            void controlPID(double distance, double heading);
 
 
         public:
@@ -44,7 +45,7 @@ namespace drive {
 
             // Move straight for some distance. If distance > 0, forward
             // otherwise backward.
-            void straightForDistance(double distance, double heading);
+            void straightForDistance(double distance);
 
             // Have the robot turn for some number of degrees. If degrees
             // is negative, turn left; if positive turn right.

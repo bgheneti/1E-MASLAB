@@ -29,7 +29,7 @@ namespace drive {
 
 
     // Control the robot's motion.
-    void DriveTrain::straightForDistance(double distance, double heading) {
+    void DriveTrain::controlPID(double distance, double heading) {
         struct timeval currentTime;
         gettimeofday(&currentTime, NULL);
 	double currentMS = ((double)currentTime.tv_sec)*1000.0 +
@@ -71,10 +71,15 @@ namespace drive {
      	leftMotor.setSpeed(0.0);
    	    rightMotor.setSpeed(0.0);
     }
+
+    void DriveTrain::straightForDistance(double distance) {
+        controlPID(distance, 0.0);
+    }
             
     // Have the robot turn for some number of degrees. If degrees
     // is negative, turn left; if positive turn right.
     void DriveTrain::turnForDegrees(double degrees) {
+        controlPID(0.0, degrees);
     }
 
 }
