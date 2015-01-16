@@ -46,7 +46,7 @@ namespace drive {
         leftMotor.setSpeed(bias);
         rightMotor.setSpeed(bias);
         while(leftEncoder.getDistance() < std::abs(distance) ||
-              (distance < .0001 && std::abs(heading - gyro.getAngle) < 2.0 )) { 
+              (distance < .0001 && std::abs(heading - gyro.getAngle()) > 2.0 )) { 
             double diff = heading - gyro.getAngle();
             gettimeofday(&currentTime, NULL);
             double newCurrentMS = ((double)currentTime.tv_sec)*1000.0 +

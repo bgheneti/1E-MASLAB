@@ -44,7 +44,7 @@ namespace drive {
 
             // Move straight for some distance. If distance > 0, forward
             // otherwise backward.
-            void straightForDistance(double distance);
+            void straightForDistance(double distance, double heading);
 
             // Have the robot turn for some number of degrees. If degrees
             // is negative, turn left; if positive turn right.
