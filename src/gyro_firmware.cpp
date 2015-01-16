@@ -25,7 +25,7 @@ namespace firmware{
 	double bias=0;
 	
 	double p=0; 
-	double q=.01;
+	double q=.0006;
 	double r=0.0002;
 	double k;
 	angle=0;
