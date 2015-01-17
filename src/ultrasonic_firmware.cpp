@@ -1,4 +1,6 @@
 #include <sys/time.h>
+#include <cmath>
+#include <math.h>
 
 #include "../include/ultrasonic_firmware.h"
 
@@ -54,6 +56,37 @@ namespace firmware{
     }
     
     //calculate distance
-    return diff*34000/2;
+    if (diff*34000/2 > 100){
+      return -1;
+    }
+    else{
+      return diff*34000/2;
+    }
   }
+  
+  double UltrasonicSensor::getHighestProbDistance(int n){
+    double distance = 0; //running sum/averagee of distances found
+    double curr = 0; //current distance measurement
+    int numReadings = 0; //number of successful hits found
+    for (int i = 0; i < n; i++){
+      curr = getDistance();
+      if (curr != -1){
+        numReadings++;
+        distance += curr;
+      }
+    }
+    if (numReadings==0){
+      return -1;
+    }
+    return distance / numReadings;
+    
+  }
+  
+  double UltrasonicSensor::getStdDev(int n, double hpDist){
+    if (hpDist == -1){ //in the case that an invalid measurement was taken
+      return -1; //skip calculation
+    }
+    return 1/sqrt(n);
+  }
+  
 }

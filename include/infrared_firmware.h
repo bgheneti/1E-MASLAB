@@ -26,8 +26,7 @@ namespace firmware{
       double getHighestProbDistance(bool close, double reading);
       
       //Returns a reasonable range of distances
-      double getLowerBound(bool close, double reading);
-      double getHigherBound(bool close, double reading);
+      double getStdDev(bool close, int n, double reading);
   };
 }
 #endif

@@ -14,6 +14,12 @@ namespace firmware{
       
       //returns the distance in cm corresponding to the length of the echo
       double getDistance();
+      
+      //returns the highest probability distance based on multiple distance readings
+      double getHighestProbDistance(int n);
+      
+      //return reasonable ranges of distances based on highest prob distance
+      double getStdDev(int n, double hpDist);
   };
 }
 #endif
