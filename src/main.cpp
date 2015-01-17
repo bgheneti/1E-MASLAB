@@ -2,10 +2,14 @@
 #include <cmath>
 #include <csignal>
 #include <iostream>
+#include <thread>
+#include <chrono>
 
 #include "mraa.hpp"
 #include "../include/motor_firmware.h"
 #include "../include/encoder_firmware.h"
+#include "../include/servo_firmware.h"
+#include "../include/i2c_pwm_wrapper.h"
 
 int running = 1;
 
@@ -18,8 +22,7 @@ void sig_handler(int signo) {
 
 int main() {
     signal(SIGINT, sig_handler);
-    
-    // Motor setup
+    /*// Motor setup
     firmware::Motor motorR = firmware::Motor(9, 8);
     firmware::Motor motorL = firmware::Motor(3, 2);
 
@@ -28,19 +31,24 @@ int main() {
     firmware::Encoder encoderR = firmware::Encoder(6, 7);
 
     double speed = 0.25;
-    motorR.setSpeed(pwmL, dirL, speed);
-    motorLsetSpeed(pwmR, dirR, speed);
-    while(running) {
-        running++;
-        encoderL.poll();     
-   	    encoderR.poll();
-        if(running > 100000) {
-            running = 0;
-        }
-    }
+    motorR.setSpeed(speed);
+    motorL.setSpeed(speed);
+    encoderL.startPolling();
+    encoderR.startPolling();
+    std::chrono::milliseconds sleep_time(10000);
+    std::this_thread::sleep_for(sleep_time);
+    encoderL.stopPolling();
+    encoderR.stopPolling();
     printf("Left encoder reads: %d",  encoderL.getNumTicks());
     printf("Right encoder reads: %d",  encoderR.getNumTicks());
     motorR.stop();
     motorL.stop();
+    */
+
+    firmware::Servo servo = firmware::Servo(0);
+    servo.setServoPosition(-90.0);
+    std::chrono::milliseconds sleep_time(10000);
+    std::this_thread::sleep_for(sleep_time);
+    servo.setServoPosition(90.0);
 }
 

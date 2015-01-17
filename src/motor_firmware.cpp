@@ -26,7 +26,7 @@ namespace firmware {
     }
 
     // Abruptly stops the motor (sets its speed to 0)
-    void Motor::stopMotor() {
+    void Motor::stop() {
         pwm.write(0.0);
         dir.write(0);
         speed = 0.0;

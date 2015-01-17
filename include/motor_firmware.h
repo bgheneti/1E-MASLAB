@@ -17,7 +17,7 @@ namespace firmware {
             void setSpeed(double newSpeed);
 
             // Stops the motor abruptly
-            void stopMotor();
+            void stop();
 
             // Gets the speed of the motor
             double getSpeed();
