@@ -1,9 +1,12 @@
 #ifndef INCLUDE_MAP_H_
 #define INCLUDE_MAP_H_
 
+#include <vector>
+
 namespace map {
     // Represents an element on the map.
     enum Element { EMPTY, // No object could be in this spot
+                   OUTSIDE, // Outside the walls of region
                    WALL, // A wall or platform sensable by IR
                    STACK_R, // A stack wtih 2R and 1G blocks
                    STACK_G, // A stack with 2G and 1R blocks 
@@ -12,6 +15,7 @@ namespace map {
     struct Point {
         int x;
         int y;
+        Point(int x, int y) : x(x), y(y) {}
     };
     // The Map class contains a vector array representing the map
     // as well as functions to determine which zone of the map we are
@@ -21,6 +25,10 @@ namespace map {
             std::vector<Element> map;
             std::vector<Point> homebase; // A vector containing the vertices
                                          // of the home base polygon
+            std::vector<Point> walls;
+            std::vector<Point> stacksR;
+            std::vector<Point> stacksG;
+            std::vector<Point> stacksUs;
         public:
             // Create a map from a map file
             Map(std::string filename);
@@ -29,11 +37,10 @@ namespace map {
             std::vector<Element> getMap();
 
             // Add a STACK_US to the map at position (x, y)
-            void addStack(Element droppedStack, double x, double y);
+            void addStack(double x, double y);
 
             // Determines whether a point is in home base
             bool inHomeBase(double x, double y);
-            bool inHomeBase(Point point);
 
             // Gets a point inside home base that is far from any other dropped
             // stacks. Returns (-7, -7) if this is not possible within the
