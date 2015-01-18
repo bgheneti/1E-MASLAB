@@ -1,3 +1,4 @@
+#include <iostream>
 #include <cmath>
 #include <cassert>
 #include <math.h>
@@ -31,7 +32,7 @@ namespace firmware{
   //returns {highest probability value, low reasonable, high reasonable}
   double InfraredSensor::getHighestProbDistance(bool close, double reading){
     double highestProbDistance=0;
-    std::cout << (reading-206.55)/32.81 << "\t" << pow(double(reading)/(9609.5+longRangeBias1), -1/(0.965+longRangeBias2)) << "\t" << (713.64-reading)/10.866 << std::endl;
+    //std::cout << (reading-206.55)/32.81 << "\t" << pow(double(reading)/(9609.5+longRangeBias1), -1/(0.965+longRangeBias2)) << "\t" << (713.64-reading)/10.866 << std::endl;
     if (close){
       highestProbDistance = (reading-206.55)/32.81;
     }
@@ -46,11 +47,12 @@ namespace firmware{
   
   //returns the lower reasonable bound of possible distances
   double InfraredSensor::getStdDev(bool close, int n, double reading){
-    double allowance = 30/sqrt(n);
+    double allowance = 50.0;//sqrt(n*1.0);
     double hpDist = InfraredSensor::getHighestProbDistance(close, reading);
     double dist1 = InfraredSensor::getHighestProbDistance(close, reading - allowance);
     double dist2 = InfraredSensor::getHighestProbDistance(close, reading + allowance);
-    return (abs(dist1 - hpDist) + abs(dist2 - hpDist))/2;
+    
+    return (std::abs(dist1 - hpDist) + std::abs(dist2 - hpDist))/2;
   }
 
   

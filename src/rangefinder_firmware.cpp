@@ -1,7 +1,9 @@
+#include <iostream>
 #include "../include/rangefinder_firmware.h"
+#include <algorithm>
 
 namespace firmware{
-  Rangefinder::Rangefinder(int irPin, int usTriggerPin, int usEchoPin):ir(irPin), us(usTriggerPin, usEchoPin){
+  Rangefinder::Rangefinder(int irPin, int usTriggerPin, int usEchoPin) : ir(irPin), us(usTriggerPin, usEchoPin){
     stdDev = -1;
     estimatedDistance=-1; //the short-term distance (resistant to change)
     longTermDistance=-1; //the long-term distance (extremely resistant to change)
@@ -9,44 +11,43 @@ namespace firmware{
   
   //returns an estimate of distance
   double Rangefinder::getHighestProbDistance(){
-    double uvN = 5, irN = 30; //number of samples for each sensor
+    double usN = 5, irN = 30; //number of samples for each sensor
     
     //whether the sensors should look for things in the range of 0-20 cm or 20-? cm
     bool close = (estimatedDistance != -1) && (estimatedDistance < 20);
     
-    //get uv info
-    double uvDist = uv.getHighestProbDistance(uvN);
-    double uvS = uv.getStdDev(uvN, uvDist);
-    
+    //get us info
+    double usDist = us.getHighestProbDistance(usN);
+    double usS = us.getStdDev(usN, usDist);
+    //std::cout << usDist << "\t" << usS << std::endl;
     //get ir info
     double irReading = ir.getReading(irN);
     double irDist = ir.getHighestProbDistance(close, irReading);
     double irS = ir.getStdDev(close, irN, irReading);
-    
+    //std::cout << irDist << "\t" << irS << std::endl;
     double currDistance = -1; //the distance from this set of readings only
     
     //find an estimate of currDistance
-    if (uvDist == -1){//if no uv reading was obtained
+    if (usDist == -1){//if no us reading was obtained
       currDistance = irDist; //use only the ir one
       stdDev = irS;
     }
-    else{ //if there was a uv reading
-      if (uvDist < irHigher && uvDist > irLower){ //if uv seems reasonable
-        currDistance = (uvDist+irDist)/2; //average ir and uv
-        stdDev = (uvS + irS)/2;
+    else{ //if there was a us reading
+      if (abs(usDist - irDist) < irS){ //if us seems reasonable
+        currDistance = (usDist+irDist)/2; //average ir and uv
+        stdDev = (usS + irS)/2;
       }
-      else { //if uv is not reasonable
+      else { //if us is not reasonable
         //try the other side of the curve for the ir sensor
         irDist = ir.getHighestProbDistance(!close, irReading);
-        irLower = ir.getLowerBound(!close, irN, irReading);
-        irHigher = ir.getHigherBound(!close, irN, irReading);
+        irS = ir.getStdDev(!close, irN, irReading);
         
-        //if uv seems reasonable now
-        if (uvDist < irHigher && uvDist > irLower){
-          currDistance = (uvDist + irDist)/2; //average the two
-          stdDev = (uvS + irS)/2;
+        //if us seems reasonable now
+        if (abs(usDist-irDist)<irS){
+          currDistance = (usDist + irDist)/2; //average the two
+          stdDev = (usS + irS)/2;
         }
-        else{ //if uv is still unreasonable
+        else{ //if us is still unreasonable
           currDistance = -1; //this entire reading should be taken as invalid
         }
       }
@@ -67,8 +68,8 @@ namespace firmware{
         //leave past estimates as they are
       }
       else{ //if there is current information
-        estimatedDistance = estimatedDistance*0.9+uvDist*0.1; //factor it in
-        longTermDistance = longTermDistance*0.99+uvDist*0.01;
+        estimatedDistance = estimatedDistance*0.9+currDistance*0.1; //factor it in
+        longTermDistance = longTermDistance*0.99+currDistance*0.01;
       }
     }
     

@@ -1,6 +1,7 @@
 #include <sys/time.h>
 #include <cmath>
 #include <math.h>
+#include <iostream>
 
 #include "../include/ultrasonic_firmware.h"
 
@@ -86,7 +87,8 @@ namespace firmware{
     if (hpDist == -1){ //in the case that an invalid measurement was taken
       return -1; //skip calculation
     }
-    return 1/sqrt(n);
+    
+    return 1.5;//sqrt(n*1.0);
   }
   
 }
