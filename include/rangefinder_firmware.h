@@ -1,6 +1,7 @@
 #ifndef INCLUDE_RANGEFINDER_FIRMWARE_H_
 #define INCLUDE_RANGEFINDER_FIRMWARE_H_
-
+#include "infrared_firmware.h"
+#include "ultrasonic_firmware.h"
 #include "mraa.hpp"
 
 namespace firmware{
@@ -25,5 +26,6 @@ namespace firmware{
       
       //returns the probability that a block has been passed recently
       double getProbOfBlock();
+  };
 }
 #endif

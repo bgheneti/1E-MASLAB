@@ -73,7 +73,7 @@ namespace firmware{
       }
     }
     
-    return currDistance;
+    return estimatedDistance;
   }
   
   //returns a reasonable lower bound
