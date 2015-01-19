@@ -3,17 +3,17 @@
 enum Color{
   red,
   green
-}
+};
 
 namespace vision{
     class Block{
         private:
-	    const double dimension = .0508;
-	    std::polar position;
+	    const double dimension;
+	    std::complex<double> position;
 	    Color cubeColor;
         public:
-	    Block(std::polar pos, Color color);
-	    double getPosition();
+	    Block(std::complex<double> pos, Color color);
+	    std::complex<double> getPosition();
 	    Color getColor();
-    }
+    };
 }
