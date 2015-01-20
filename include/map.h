@@ -18,6 +18,8 @@ namespace map {
              STACK_US // Stack our bot dropped
         };
 
+    enum Zone {FIELD, HOME};
+
     class Map {
         private:
             std::vector<std::vector<Element> > grid;
@@ -26,6 +28,15 @@ namespace map {
 
         public:
             Map(std::string filename);
+            std::vector<std::vector<Element> > getGrid();
+            void putDownStack(double x, double y);
+            void putDownStack(int x, int y);
+            utils::Point getLocation();
+            void setLocation(double x, double y);
+            void setLocation(int x, int y);
+            void setLocationRelative(double deltaX, double deltaY);
+            void setLocationRelative(int deltaX, int deltaY);
+            utils::Point whereToDropStack(Zone zone);
             void print();
 
     };

@@ -20,7 +20,7 @@ namespace map {
         // Initialize temp structures for the map
         std::vector<utils::Point> walls; // even start point and odd end point
         std::vector<utils::Point> homebase; // vertices in the polygon
-        stacks.resize(4);
+        stacks.resize(5);
 
         // Now parse the file and populate structures using map format coords
         std::ifstream mapfile(filename.c_str());
@@ -138,8 +138,9 @@ namespace map {
                         if(std::min(startPoint.y, endPoint.y) <= y &&
                            std::max(startPoint.y, endPoint.y) >= y &&
                            double(y-startPoint.y)/slope + startPoint.x >= x) {
-                            grid[y][x] = HOMEBASE;
+                            count++;
                         }
+                        if(count%2==1) grid[y][x] = HOMEBASE;
                         endIndex = startIndex;
                     }
                 }
@@ -214,6 +215,51 @@ namespace map {
             std::cout << "Unable to open file " << filename << std::endl;
         }
         
+    }
+
+    std::vector<std::vector<Element> > Map::getGrid() {
+        return grid;
+    }
+
+    void Map::putDownStack(double x, double y) {
+        utils::Point stackPoint(x, y);
+        stacks[4].push_back(stackPoint);
+        grid[stackPoint.y][stackPoint.x] = STACK_US;
+    }
+
+    void Map::putDownStack(int x, int y) {
+        utils::Point stackPoint(x, y);
+        stacks[4].push_back(stackPoint);
+        grid[y][x] = STACK_US;
+
+    }
+
+    utils::Point Map::getLocation() {
+        return botLocation;
+    }
+
+    void Map::setLocation(double x, double y) {
+        botLocation = utils::Point(x, y);
+    }
+
+    void Map::setLocation(int x, int y) {
+        botLocation = utils::Point(x, y);
+
+    }
+
+    void Map::setLocationRelative(double deltaX, double deltaY) {
+        botLocation.x += round(deltaX);
+        botLocation.y += round(deltaY);
+    }
+
+    void Map::setLocationRelative(int deltaX, int deltaY) {
+        botLocation.x += deltaX;
+        botLocation.y += deltaY;
+    }
+
+    utils::Point Map::whereToDropStack(Zone zone) {
+
+
     }
 
     void Map::print() {
