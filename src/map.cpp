@@ -69,45 +69,38 @@ namespace map {
             
             // Compute the dimensions of the grid and initialize it to those
             // dimensions
-            int minX=INT_MAX, minY=INT_MAX, maxX=INT_MIN, maxY=INT_MIN;
-            for(int i=0; i<walls.size(); i++) {
-                minX = walls[i].x < minX ? walls[i].x : minX;
-                maxX = walls[i].x > maxX ? walls[i].x : maxX;
-                minY = walls[i].y < minY ? walls[i].y : minY;
-                maxY = walls[i].y > maxY ? walls[i].y : maxY;
-            }
+            utils::AxisAlignedBoundingBox fieldBB(walls);
             
-            utils::Point lowerRight(maxX, maxY);
-            lowerRight.convertToInternal(minX, minY);
+            utils::Point lowerRight(fieldBB.maxX, fieldBB.maxY);
+            lowerRight.convertToInternal(fieldBB.minX, fieldBB.minY);
             for(int y=0; y<=lowerRight.y; y++) {
                 std::vector<Element> row;
                 for(int x=0; x<=lowerRight.x; x++) {
-                    row.push_back(EMPTY);
+                    row.push_back(OUT_OF_BOUNDS);
                 }
                 grid.push_back(row);
             }
 
             // Convert all points 
             for(int i=0; i<walls.size(); i+=1) {
-                walls[i].convertToInternal(minX, minY);
+                walls[i].convertToInternal(fieldBB.minX, fieldBB.minY);
             }
             for(int i=0; i<stacks.size(); i++) {
                 for(int j=0; j<stacks[i].size(); j++) {
-                    stacks[i][j].convertToInternal(minX, minY);
+                    stacks[i][j].convertToInternal(fieldBB.minX, fieldBB.minY);
                 }
             }
             for(int i=0; i<homebase.size(); i++) {
-                homebase[i].convertToInternal(minX, minY);
+                homebase[i].convertToInternal(fieldBB.minX, fieldBB.minY);
             }
-            botLocation.convertToInternal(minX, minY);
+            botLocation.convertToInternal(fieldBB.minX, fieldBB.minY);
 
             // Add no-man-zone to the map
             int startIndex = homebase.size() - 1;
             for(int endIndex=0; endIndex<homebase.size(); endIndex++) {
                 utils::Point startPoint = homebase[startIndex];
                 utils::Point endPoint = homebase[endIndex];
-                double slope = (double(endPoint.y - startPoint.y)) /
-                               (double(endPoint.x - startPoint.x));
+                double slope = startPoint.slope(endPoint);
                 utils::Point minXPoint = startPoint.x < endPoint.x ? 
                                   startPoint : endPoint;
                 utils::Point maxXPoint = startPoint.x < endPoint.x ? 
@@ -130,7 +123,6 @@ namespace map {
             
             // Fill in home base
             utils::AxisAlignedBoundingBox homebaseBB(homebase);
-            std::cout << homebaseBB.minX << std::endl;
             for(int y=homebaseBB.minY; y < homebaseBB.maxY; y++) {
                 for(int x=homebaseBB.minX; x < homebaseBB.maxX; x++) {
                     if(grid[y][x]==NO_MAN_ZONE) continue;
@@ -152,6 +144,72 @@ namespace map {
                     }
                 }
             }
+
+            // Put walls on map
+            for(int i=0; i<walls.size(); i+=2) {
+                utils::Point point1 = walls[i];
+                utils::Point point2 = walls[i+1];
+                if(point1.x==point2.x) {     
+                    for(int y=std::min(point1.y, point2.y);
+                        y<=std::max(point1.y, point2.y); y++) {
+                        grid[y][point1.x] = WALL;
+                    }
+                } else {
+                    for(int x=std::min(point1.x, point2.x); 
+                        x<=std::max(point1.x, point2.x); x++) {
+                        double slope = point1.slope(point2);
+                        int y = slope * double(x-point1.x) + point1.y;
+                        grid[y][x] = WALL;
+                    }
+               
+                }
+            }
+
+            // Fill in empty spaces using BFS from botLocation
+            
+            // If botLocation is in home base, explore outward until point
+            // not in home base is found without crossing a wall
+            std::vector<utils::Point> queue;
+            queue.push_back(botLocation);
+            while(queue.size() > 0) {
+                utils::Point pt = queue.back();
+                queue.pop_back();
+                if(grid[pt.y][pt.x]==OUT_OF_BOUNDS) {
+                    queue.clear();
+                    queue.push_back(pt);
+                    break;
+                } else if(grid[pt.y][pt.x]==HOMEBASE ||
+                          grid[pt.y][pt.x]==NO_MAN_ZONE) {
+                    queue.insert(queue.begin(), utils::Point(pt.x, pt.y+1));
+                    queue.insert(queue.begin(), utils::Point(pt.x, pt.y-1));
+                    queue.insert(queue.begin(), utils::Point(pt.x+1, pt.y));
+                    queue.insert(queue.begin(), utils::Point(pt.x-1, pt.y));
+                }
+            } 
+
+            // Now search outward like normal
+            while(queue.size() > 0) {
+                utils::Point pt = queue.back();
+                queue.pop_back();
+                if(grid[pt.y][pt.x]==OUT_OF_BOUNDS) {
+                    grid[pt.y][pt.x] = EMPTY;
+                    queue.insert(queue.begin(), utils::Point(pt.x, pt.y+1));
+                    queue.insert(queue.begin(), utils::Point(pt.x, pt.y-1));
+                    queue.insert(queue.begin(), utils::Point(pt.x+1, pt.y));
+                    queue.insert(queue.begin(), utils::Point(pt.x-1, pt.y));
+                }
+            }
+
+            // Populate stacks
+            for(int numRed=0; numRed < 4; numRed++) {
+                Element elements[] = {STACK_0R, STACK_1R, 
+                                      STACK_2R, STACK_3R};
+                for(int i=0; i<stacks[numRed].size(); i++) {
+                    grid[stacks[numRed][i].y][stacks[numRed][i].x] = 
+                        elements[numRed];
+                }
+            }
+        
         } else {
             std::cout << "Unable to open file " << filename << std::endl;
         }
@@ -173,7 +231,7 @@ namespace map {
                         charToPrint = ' ';
                         break;
                     case WALL:
-                        charToPrint = '-';
+                        charToPrint = '=';
                         break;
                     case STACK_0R:
                         charToPrint = '0';
