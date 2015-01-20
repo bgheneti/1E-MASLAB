@@ -1,11 +1,10 @@
 #include <cassert>
 #include <iostream>
-#include "i2c_pwm_wrapper.h"
+#include "../include/i2c_pwm_wrapper.h"
 
 namespace utils {
 
-    I2cPwmWrapper::I2cPwmWrapper(int outputPin) : i2c(BUS_NUMBER) {
-        outputPin = outputPin;
+    I2cPwmWrapper::I2cPwmWrapper(int outputPin) : i2c(BUS_NUMBER), outputPin(outputPin) {
 
         writeBuf[0] = 0x00; // Write to MODE 1 Register;
         writeBuf[1] = 1 << 4; // Enale Sleep Mode
@@ -13,6 +12,7 @@ namespace utils {
         i2c.address(SHIELD_I2C_ADDR);
         i2c.write(writeBuf, 2);
 
+	usleep(10000);
         writeBuf[0] = 0xFE; // Write Prescalar Register
         writeBuf[1] = 0xA3; // Set pwm frequency to ~40 Hz
 
@@ -31,8 +31,6 @@ namespace utils {
         assert(0.0 <= duty && duty <= 1.0);
         int on = (int) (4095.0*duty);
 
-        std::cout << on << std::endl;
-
         writeBuf[0] = 6 + 4*outputPin;
         writeBuf[1] = 0x00; // ON LSB
         writeBuf[2] = 0x00; // ON MSB
@@ -42,4 +40,5 @@ namespace utils {
 	i2c.write(writeBuf, 5);
     }
 }
+
 
