@@ -3,22 +3,30 @@
 
 #include <stdio.h>
 #include "block.h"
+#include <thread>
+#include "cmath"
+#include "opencv2/opencv.hpp"
+
+using namespace cv;
 
 namespace vision{
     class Cam{
         private:
-	    const double height;
+	    const double height=0.3429;
 	    const double hViewAngle=40;
 	    const double vViewAngle=60;
 	    int running;
             std::thread runner;
 	    void processFrame(Mat& inFrame);
 	    void poll();
- 	    Block blocks[];	    
+	    void addMat(Mat& a, Mat& b);
+	    void findCubes(Mat& inFrame);
+	    void processFrame(Mat& inFrame, Mat& outFrame);
+            Block blocks[];
         public:	    
 	    void startPoll();
 	    void stopPoll();
-	    Block[] getBlocks();
-    }
+	    Block* getBlocks();
+    };
 }
 #endif
