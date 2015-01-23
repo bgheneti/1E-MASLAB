@@ -15,6 +15,7 @@ namespace vision{
 	    const double height=0.3429;
 	    const double hViewAngle=40;
 	    const double vViewAngle=60;
+	    const double angleDown=25;
 	    int running;
             std::thread runner;
 	    void processFrame(Mat& inFrame);
@@ -22,11 +23,11 @@ namespace vision{
 	    void addMat(Mat& a, Mat& b);
 	    void findCubes(Mat& inFrame);
 	    void processFrame(Mat& inFrame, Mat& outFrame);
-            Block blocks[];
+	    std::vector<Block*> blocks;
         public:	    
 	    void startPoll();
 	    void stopPoll();
-	    Block* getBlocks();
+	    std::vector<Block*> getBlocks();
     };
 }
 #endif
