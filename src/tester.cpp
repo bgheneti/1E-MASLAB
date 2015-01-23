@@ -19,7 +19,7 @@ void sig_handler(int signo){
 int main(){
   signal(SIGINT, sig_handler);
   
-  firmware::Rangefinder rf = firmware::Rangefinder(0, 0, 1);
+  map::Localizer lc = map::Localizer();
   double hpDist = 0;
   while (running){
     hpDist = rf.getHighestProbDistance();

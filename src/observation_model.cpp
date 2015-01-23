@@ -18,32 +18,37 @@ namespace map{
         else{std::cout << e << std::endl;}
       }
     }
-    startX = c/2;
-    startY = r/2;
+    
+    xMax = g[0].size() - 1;
+    yMax = g.size() - 1;
   }
   
   //returns the probability of a sensor hit in this area
   //x and y in tens of centimeters
   double getProb(double x, double y){
-    return probMap[int(y)][int(x)];
+    return probMap[int(y+0.5)][int(x+0.5)];
   }
-  double setLoc(double x, double y){
-    startX = int(x*10)/10.0;
-    startY = int(y*10)/10.0;
+  
+  double getXMax(){
+    return xMax;
+  }
+  double getYMax(){
+    return xMax;
   }
   //returns the probability of getting l1, l2, l3 given p
   //l1, l2, l3 are in centimeters
   double ObservationModel::getPObsGivenPos(Particle p, double l1, double l2, double l3){
-    double pL1 = getPDistance();
-    double pL2 = getPDistance();
-    double pL3 = getPDistance();
+    
+    double pL1 = getPDistance(p.x, p.y, p.th, 1, 1, l1);
+    double pL2 = getPDistance(p.x, p.y, p.th, 1, 1, l2);
+    double pL3 = getPDistance(p.x, p.y, p.th, 1, 1, l3);
     
     return pL1 * pL2 * pL3;
   }
   
   //probability of getting distance given the other stuff.  Slope and intercept describe the direction of the sensors
   //distance in centimeters
-  double ObservationModel::getPDistance(double slope, double intercept, double distance){
+  double ObservationModel::getPDistance(double startX, double startY, double currTh, double slope, double intercept, double distance){
     double p = 1;
     double stepX = std::min(1, std::abs(1/slope));
     double stepY = slope * stepX;
