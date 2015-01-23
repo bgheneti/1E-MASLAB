@@ -210,6 +210,31 @@ namespace map {
                         elements[numRed];
                 }
             }
+
+            // Mark passable points (the robot could fit at them)
+            for(int y=0; y<grid.size(); y++) {
+                for(int x=0; x<grid[0].size(); x++) {
+                    if(grid[y][x] != EMPTY) continue;
+                    bool passable = true;
+                    for(int deltaY=-2; deltaY<=2; deltaY++) {
+                        for(int deltaX=-2; deltaX<=2; deltaX++) {
+                            if(y+deltaY<0 || y+deltaY>=grid.size() ||
+                               x+deltaX<0 || x+deltaX>=grid[0].size() ||
+                               (grid[y+deltaY][x+deltaX]!=EMPTY &&
+                                grid[y+deltaY][x+deltaX]!=PASSABLE &&
+                                grid[y+deltaY][x+deltaX]!=STACK_0R &&
+                                grid[y+deltaY][x+deltaX]!=STACK_1R &&
+                                grid[y+deltaY][x+deltaX]!=STACK_2R &&
+                                grid[y+deltaY][x+deltaX]!=STACK_3R)) {
+                                    passable=false;
+                                    break;
+                            }
+                        }
+                    }
+                    if(passable) grid[y][x] = PASSABLE;
+                }
+            }
+                       
         
         } else {
             std::cout << "Unable to open file " << filename << std::endl;
@@ -269,6 +294,9 @@ namespace map {
                 switch(grid[y][x]) {
                     case EMPTY:
                         charToPrint = '.';
+                        break;
+                    case PASSABLE:
+                        charToPrint = 'o';
                         break;
                     case HOMEBASE:
                         charToPrint = 'h';

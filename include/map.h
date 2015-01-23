@@ -7,6 +7,7 @@
 namespace map {
     enum Element {
              EMPTY, // In playing field but nothing special
+             PASSABLE,
              HOMEBASE, // In home base polygon
              OUT_OF_BOUNDS, // Not in playing field
              WALL, // The boundary of the playing field
