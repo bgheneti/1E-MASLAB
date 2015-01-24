@@ -14,16 +14,17 @@
 #define GREEN 0x18
 #define BLUE 0x1A
 
-namespace firmware {
+namespace firmware{
     class Color {
         private:
             mraa::I2c i2c;
-            int rgb[3];
+            uint16_t rgb[3];
             int running;
 	    std::thread runner;
-	    int readColor(uchar color);
+	    uint16_t readColor(int color);
         public:
-	    int[3] getColor();
+	    Color();
+	    uint16_t* getColor();
     };
 }
 #endif
