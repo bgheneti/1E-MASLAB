@@ -7,6 +7,7 @@ namespace firmware{
     stdDev = -1;
     estimatedDistance=-1; //the short-term distance (resistant to change)
     longTermDistance=-1; //the long-term distance (extremely resistant to change)
+    probNoReading = 0;
   }
   
   //returns an estimate of distance
@@ -48,7 +49,7 @@ namespace firmware{
           stdDev = (usS + irS)/2;
         }
         else{ //if us is still unreasonable
-          currDistance = -1; //this entire reading should be taken as invalid
+          currDistance = usDist; //just take the ultrasound
         }
       }
     }
@@ -56,23 +57,28 @@ namespace firmware{
     //updating longer-term estimates based on current information
     if (estimatedDistance==-1){ //if no past information
       if (currDistance == -1){ //if no current information
-        //nothing to be done about that
+        probNoReading = probNoReading * 0.9;
       }
       else{ //if there is current information
         estimatedDistance = currDistance; //store the current information
         longTermDistance = currDistance;
+        probNoReading = probNoReading * 0.9 + 0.1;
       }
     }
     else{ //if there is past information
       if (currDistance == -1){ //if there is no current information
-        //leave past estimates as they are
+        probNoReading = probNoReading * 0.9;
       }
       else{ //if there is current information
         estimatedDistance = estimatedDistance*0.9+currDistance*0.1; //factor it in
         longTermDistance = longTermDistance*0.99+currDistance*0.01;
+        probNoReading = probNoReading * 0.9 + 0.1;
       }
     }
-    
+    if (probNoReading > 0.7){
+      probNoReading = 0;
+      estimatedDistance = -1;
+    }
     return estimatedDistance;
   }
   

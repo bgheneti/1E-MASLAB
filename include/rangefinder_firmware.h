@@ -14,6 +14,7 @@ namespace firmware{
       double estimatedDistance;
       double longTermDistance;
       double stdDev;
+      double probNoReading;
     public:
       //Constructor; requires the three io pins
       Rangefinder(int irPin, int usTriggerPin, int usEchoPin);
