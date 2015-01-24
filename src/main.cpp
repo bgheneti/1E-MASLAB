@@ -11,7 +11,8 @@
 #include "../include/servo_firmware.h"
 #include "../include/i2c_pwm_wrapper.h"
 #include "../include/drive_ctrl.h"
-
+#include "../include/wallfollower.h"
+#include "../include/rangefinder_firmware.h"
 int running = 1;
 
 void sig_handler(int signo) {
@@ -22,11 +23,32 @@ void sig_handler(int signo) {
 }
 
 int main() {
+    
     signal(SIGINT, sig_handler);
+    
+    
+    firmware::Encoder encoderL(2, 3);
+    firmware::Encoder encoderR(5, 4);
+    
+    firmware::Motor motorL(2, 3);
+    firmware::Motor motorR(0, 1);
+    
+    firmware::Gyro gyro(10);
+    
+    drive::DriveTrain driveTrain(motorL, motorR, encoderL, encoderR, gyro);
+    
+    firmware::Rangefinder front(-1, -1, -1);
+    firmware::Rangefinder left(0, 8, 16);
+    firmware::Rangefinder right(1, 15, 17);
+    
+    control::Wallfollower wf = control::Wallfollower(driveTrain, front, left, right);
+    
     // Motor setup
+/*
     firmware::Motor motorR(0, 1);
     firmware::Motor motorL(2, 3); 
     firmware::Motor pickupMotor(4, 5);
+*/
 //    pickupMotor.setSpeed(-.25);
 //    usleep(5000000);
 //    pickupMotor.stop();
@@ -40,6 +62,7 @@ int main() {
 
     
     // Encoder setup
+/*
     firmware::Encoder encoderL(2, 3);
     encoderL.startPolling();
     firmware::Encoder encoderR(4, 5);
@@ -58,7 +81,7 @@ int main() {
     encoderL.stopPolling();
     encoderR.stopPolling();
     gyro.stopPoll();
-
+*/
 /*
     double speed = 0.25;
     motorR.setSpeed(speed);

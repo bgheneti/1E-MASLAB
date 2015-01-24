@@ -3,6 +3,7 @@
 
 #include "mraa.hpp"
 #include "drive_ctrl.h"
+#include "rangefinder_firmware.h"
 
 namespace control{
   // a class for making the robot follow walls
@@ -39,7 +40,7 @@ namespace control{
       void setDist(int d);
       
       //get distance
-      void getDist();
+      double getDist();
       
       //set direction
       //-1 means that the wall is on the left

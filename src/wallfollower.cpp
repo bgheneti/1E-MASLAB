@@ -16,8 +16,8 @@ namespace control{
     dist = 20;
   }
   
-  void step(){
-    //get distancces from rangefinders
+  void Wallfollower::step(){
+    //get distances from rangefinders
     frontRF.getHighestProbDistance();
     leftRF.getHighestProbDistance();
     rightRF.getHighestProbDistance();
@@ -88,7 +88,7 @@ namespace control{
     
   }
   
-  void runner(){
+  void Wallfollower::runner(){
     while (running){
       step();
       usleep(50000);
@@ -96,28 +96,28 @@ namespace control{
     }
   }
   
-  void start(){
+  void Wallfollower::start(){
     running = 1;
     runner();
   }
   
-  void stop(){
+  void Wallfollower::stop(){
     running = 0;
   }
   
-  void setDist(int d){
+  void Wallfollower::setDist(int d){
     dist = d;
   }
   
-  void getDist(){
+  double Wallfollower::getDist(){
     return dist;
   }
   
-  void setDir(int d){
+  void Wallfollower::setDir(int d){
     dir = d;
   }
   
-  int getDir(){
+  int Wallfollower::getDir(){
     return dir;
   }
 
