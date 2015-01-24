@@ -23,7 +23,7 @@ namespace vision{
 	    void addMat(Mat& a, Mat& b);
 	    void findCubes(Mat& inFrame);
 	    void processFrame(Mat& inFrame, Mat& outFrame);
-	    std::vector<Block*> blocks;
+	    std::vector<Block*> blocks;	    
         public:	    
 	    void startPoll();
 	    void stopPoll();
