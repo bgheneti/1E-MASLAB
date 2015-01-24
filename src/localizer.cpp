@@ -1,5 +1,6 @@
 #include "../include/localizer.h"
 #include <stdlib.h>
+#include <math.h>
 #include <vector>
 
 namespace map{
@@ -8,13 +9,13 @@ namespace map{
     for (int i = 0; i < sampleSize; i++){
       Particle p;
       p.weight = 1;
-      Point pt = map.getLocation();
+      utils::Point pt = m.getLocation();
       p.x = pt.x;
       p.y = pt.y;
       p.th = double(rand()%360);//0 degrees is upwards
       particles.push_back(p);
     }
-    xMax = obxModel.getXMax();
+    xMax = obsModel.getXMax();
     yMax = obsModel.getYMax();
     xMin = 0;
     yMin = 0;
@@ -44,7 +45,7 @@ namespace map{
       Particle p = particles[j];
       p.y += baselineChange;
       Particle p2;
-      p2.x = p.x
+      p2.x = p.x;
       p2.y = p.y + dy/std::abs(dy);
       p2.th = p.th;
       p2.weight = std::abs(dy-baselineChange);
@@ -69,11 +70,11 @@ namespace map{
     }
   }
   
-  void Localizer::updateWeights(double l1, double l2, double l3){
-    Particle p; 
+  void Localizer::updateWeights(double l1, double l2, double l3){ 
     double sig = 0;
     //loop through particles
     for (int i = 0; i < particles.size(); i++){
+      Particle p;
       p = particles.at(i);
       //adjust weight based on observation
       p.weight = obsModel.getPObsGivenPos(p, l1, l2, l3);
@@ -82,6 +83,7 @@ namespace map{
     }
     //loop through again to renormalize
     for (int j = 0; j < particles.size(); j++){
+      Particle p;
       p = particles.at(j);
       p.weight /= sig;
     }
@@ -118,7 +120,7 @@ namespace map{
                 Particle newParticle;
                 newParticle.x = std::min(std::max(oldParticle.x + dx, xMin), xMax);
                 newParticle.y = std::min(std::max(oldParticle.y + dy, yMin), yMax);
-                newParticle.th = (oldParticle.th + dth)%360;
+                newParticle.th = fmod((oldParticle.th + dth), 360.0);
                 newParticle.weight = 1;
                 newParticles.push_back(newParticle);
                 sig += newParticle.weight;
@@ -133,7 +135,7 @@ namespace map{
     particles = newParticles;
     //loop through again to renormalize
     for (int j = 0; j < particles.size(); j++){
-      p = particles.at(j);
+      Particle p = particles.at(j);
       p.weight /= sig;
     }
   }

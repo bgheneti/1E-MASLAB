@@ -16,11 +16,7 @@ namespace firmware {
             void poll();
         public:
             Encoder(int inputPin1, int inputPin2);
-<<<<<<< HEAD
             int getNumTicks();
-=======
-            double getDistance();
->>>>>>> 1c5985843c50e35f4db7cfa6f4e7c7032c8f8e03
             void resetNumTicks();
             void startPolling();
             void stopPolling();

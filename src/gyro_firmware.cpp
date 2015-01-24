@@ -1,18 +1,9 @@
 #include "../include/gyro_firmware.h"
 #include <unistd.h>
-<<<<<<< HEAD
 #include <stdint.h>
 #include <signal.h>
 #include <sys/time.h>
 #include <thread>
-=======
-#include <math.h>
-#include <stdint.h>
-#include <signal.h>
-#include <thread>
-#include <sys/time.h>
-
->>>>>>> 1c5985843c50e35f4db7cfa6f4e7c7032c8f8e03
 int MS=1000;
 namespace firmware{
 
@@ -27,20 +18,9 @@ namespace firmware{
         writeBuf[3] = (sensorRead >> 24) & 0xff;
         struct timeval tv;
         int init = 0;
-<<<<<<< HEAD
 	int biasCalcRuns=50;
 	int totalBiasCalcRuns=biasCalcRuns;
 	double bias=0;
-=======
-	int biasCalcRuns=200;
-	int totalBiasCalcRuns=biasCalcRuns;
-	double bias=0;
-	
-	double p=0; 
-	double q=.001;
-	double r=0.0006;
-	double k;
->>>>>>> 1c5985843c50e35f4db7cfa6f4e7c7032c8f8e03
 	angle=0;
 	while(running){
 	    if(zero){
@@ -58,23 +38,15 @@ namespace firmware{
 	        // Sensor reading
 		short reading = (recvVal >> 10) & 0xffff;
 		if (init) {
-<<<<<<< HEAD
 		    unsigned long long ms = (unsigned long long)(tv.tv_sec)*1000 + 
 		      (unsigned long long)(tv.tv_usec) / 1000;
 		    gettimeofday(&tv, NULL);
 		    ms -= (unsigned long long)(tv.tv_sec)*1000 +
-=======
-		    unsigned long long ms = (unsigned long long)(tv.tv_sec) * 1000 + 
-		      (unsigned long long)(tv.tv_usec) / 1000;
-		    gettimeofday(&tv, NULL);
-		    ms -= (unsigned long long)(tv.tv_sec) * 1000 +
->>>>>>> 1c5985843c50e35f4db7cfa6f4e7c7032c8f8e03
 		      (unsigned long long)(tv.tv_usec) / 1000;
 		    int msi = (int)ms;
 		    float msf = (float)msi;
 		    float rf = (float) reading;
 		    if(biasCalcRuns>0){
-<<<<<<< HEAD
 		        bias+= -0.001 * msf * ((rf / 80.0) / totalBiasCalcRuns);
 		        biasCalcRuns--;
 		        printf("msf: %f",msf);
@@ -84,29 +56,6 @@ namespace firmware{
 		      angularVelocity = (-msf/newRateConstant)*(newAngularVelocity)+
 			(1+msf/newRateConstant)*angularVelocity;
 		      angle+=angularVelocity;
-=======
-		        bias += -0.001 * msf * ((rf / 80.0) / totalBiasCalcRuns);
-		        biasCalcRuns--;
-		    }
-		    else{
-		      double newAngularVelocity= -0.001 * msf * (rf / 80.0) - bias;
-		      //printf("new: %f \n", newAngularVelocity);
-		      p = p + q;
-		      k = p / (p + r);
-		      angularVelocity += k * (newAngularVelocity - angularVelocity);
-			//angularVelocity = (-msf/newRateConstant)*(newAngularVelocity)+
-			//(1+msf/newRateConstant)*angularVelocity;
-		      p = (1 - k) * p;
-		      angle += angularVelocity;
-		      angle = fmod(angle,360);
-		      printf("total: %f\n",angle);
-		      if(angle > 180){
-			angle -= 360;
-		      }
-		      else if(angle < -180){
-			angle += 360;
-		      }
->>>>>>> 1c5985843c50e35f4db7cfa6f4e7c7032c8f8e03
 		    }
 		}
 		else {
@@ -117,11 +66,7 @@ namespace firmware{
 	    else {
 		printf("No recv\n");
 	    }
-<<<<<<< HEAD
 	    usleep(10*MS);
-=======
-	    usleep(2*MS);
->>>>>>> 1c5985843c50e35f4db7cfa6f4e7c7032c8f8e03
 	}
     }
 
@@ -133,10 +78,6 @@ namespace firmware{
             spi.bitPerWord(32);
 	    std::thread thr(&Gyro::poll, this);
 	    std::swap(thr, runner);
-<<<<<<< HEAD
-=======
-	    runner.detach();
->>>>>>> 1c5985843c50e35f4db7cfa6f4e7c7032c8f8e03
         }
     }
 

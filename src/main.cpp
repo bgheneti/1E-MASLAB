@@ -10,11 +10,8 @@
 #include "../include/encoder_firmware.h"
 #include "../include/servo_firmware.h"
 #include "../include/i2c_pwm_wrapper.h"
-<<<<<<< HEAD
-=======
-#include "../include/drive_ctrl.h"
->>>>>>> 1c5985843c50e35f4db7cfa6f4e7c7032c8f8e03
-
+#include "../include/observation_model.h"
+#include "../include/localizer.h"
 int running = 1;
 
 void sig_handler(int signo) {
@@ -26,15 +23,16 @@ void sig_handler(int signo) {
 
 int main() {
     signal(SIGINT, sig_handler);
-<<<<<<< HEAD
-    /*// Motor setup
-    firmware::Motor motorR = firmware::Motor(9, 8);
-    firmware::Motor motorL = firmware::Motor(3, 2);
-=======
+    
+    map::Map m = map::Map("");
+    map::Localizer lc = map::Localizer(m, 0, 8, 16, 1, 9, 17, -1, -1, -1);
+    
     // Motor setup
+/*
     firmware::Motor motorR(0, 1);
     firmware::Motor motorL(2, 3); 
     firmware::Motor pickupMotor(4, 5);
+*/
 //    pickupMotor.setSpeed(-.25);
 //    usleep(5000000);
 //    pickupMotor.stop();
@@ -45,9 +43,8 @@ int main() {
     motorR.setSpeed(0.0);
     motorL.setSpeed(0.0);
 */
->>>>>>> 1c5985843c50e35f4db7cfa6f4e7c7032c8f8e03
 
-    
+/*    
     // Encoder setup
     firmware::Encoder encoderL(2, 3);
     encoderL.startPolling();
@@ -67,7 +64,7 @@ int main() {
     encoderL.stopPolling();
     encoderR.stopPolling();
     gyro.stopPoll();
-
+*/
 /*
     double speed = 0.25;
     motorR.setSpeed(speed);
@@ -76,21 +73,7 @@ int main() {
     encoderR.startPolling();
     std::chrono::milliseconds sleep_time(10000);
     std::this_thread::sleep_for(sleep_time);
-<<<<<<< HEAD
-    encoderL.stopPolling();
-    encoderR.stopPolling();
-    printf("Left encoder reads: %d",  encoderL.getNumTicks());
-    printf("Right encoder reads: %d",  encoderR.getNumTicks());
-    motorR.stop();
-    motorL.stop();
-    */
 
-    firmware::Servo servo = firmware::Servo(0);
-    servo.setServoPosition(-90.0);
-    std::chrono::milliseconds sleep_time(10000);
-    std::this_thread::sleep_for(sleep_time);
-    servo.setServoPosition(90.0);
-=======
     encoderL.stopPolling(); 
     encoderR.stopPolling(); 
     printf("Left encoder reads: %f",  encoderL.getDistance());
@@ -107,6 +90,5 @@ int main() {
     servo.setServoPosition(90.0);
    */ 
    
->>>>>>> 1c5985843c50e35f4db7cfa6f4e7c7032c8f8e03
 }
 

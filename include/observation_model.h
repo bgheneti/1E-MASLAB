@@ -21,12 +21,12 @@ namespace map{
       ObservationModel(Map m);
       
       double getProb(double x, double y);
-      double getXMax(){};
-      double getYMax(){};
+      double getXMax();
+      double getYMax();
       //get probability of a particle with observations l1, l2, and l3 from rangefinders
       double getPObsGivenPos(Particle p, double l1, double l2, double l3);
       //probability of getting distance given other information about sensor
-      double getPDistance(double slope, double intercept, double distance);
+      double getPDistance(double startX, double startY, double currTh, double slope, double intercept, double distance);
   };
 }
 

@@ -41,7 +41,3 @@ namespace utils {
     }
 }
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 1c5985843c50e35f4db7cfa6f4e7c7032c8f8e03

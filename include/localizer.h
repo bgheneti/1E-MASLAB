@@ -11,7 +11,7 @@ namespace map{
     private:
       std::vector<Particle> particles;
       int sampleSize;
-      int xMax, yMax, xMin, yMin;
+      double xMax, yMax, xMin, yMin;
       ObservationModel obsModel;
       firmware::Rangefinder r1, r2, r3;
     public:

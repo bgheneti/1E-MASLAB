@@ -1,6 +1,7 @@
 #include "../include/map.h"
 #include <iostream>
 #include <algorithm>
+#include "../include/observation_model.h"
 
 namespace map{
   //generates a 
@@ -10,7 +11,7 @@ namespace map{
     for (int r = 0; r < g.size(); r++){
       
       for (int c = 0; c < g[0].size(); c++){
-        e=[r][c];
+        e=g[r][c];
         if (e == EMPTY || e == HOMEBASE || e == NO_MAN_ZONE){probMap[r][c] = 0.01;}
         else if (e==OUT_OF_BOUNDS){probMap[r][c] = 0.001;}
         else if (e==WALL){probMap[r][c] = 0.99;}
@@ -25,14 +26,14 @@ namespace map{
   
   //returns the probability of a sensor hit in this area
   //x and y in tens of centimeters
-  double getProb(double x, double y){
+  double ObservationModel::getProb(double x, double y){
     return probMap[int(y+0.5)][int(x+0.5)];
   }
   
-  double getXMax(){
+  double ObservationModel::getXMax(){
     return xMax;
   }
-  double getYMax(){
+  double ObservationModel::getYMax(){
     return xMax;
   }
   //returns the probability of getting l1, l2, l3 given p
@@ -50,7 +51,7 @@ namespace map{
   //distance in centimeters
   double ObservationModel::getPDistance(double startX, double startY, double currTh, double slope, double intercept, double distance){
     double p = 1;
-    double stepX = std::min(1, std::abs(1/slope));
+    double stepX = std::min(1.0, std::abs(1/slope));
     double stepY = slope * stepX;
     double currX = startX;
     double currY = startY;
