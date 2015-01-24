@@ -46,7 +46,7 @@ namespace drive {
         leftMotor.setSpeed(bias);
         rightMotor.setSpeed(bias);
         while(leftEncoder.getDistance() < std::abs(distance) ||
-              (distance < .0001 && std::abs(heading - gyro.getAngle()) > 2.0 )) { 
+              (distance < .0001 && std::abs(heading - gyro.getAngle()) > 1.0 )) { 
             double diff = heading - gyro.getAngle();
             gettimeofday(&currentTime, NULL);
             double newCurrentMS = ((double)currentTime.tv_sec)*1000.0 +
@@ -58,11 +58,11 @@ namespace drive {
             power = P*diff + I*integral + D*derivative;
             double leftMotorSpeed = bias - power;
             double rightMotorSpeed = bias + power;
-            if(std::abs(leftMotorSpeed) > .3) {
-                leftMotorSpeed = leftMotorSpeed < 0 ? -.3 : .3;
+            if(std::abs(leftMotorSpeed) > .5) {
+                leftMotorSpeed = leftMotorSpeed < 0 ? -.5 : .5;
             }
-            if(std::abs(rightMotorSpeed) > .3) {
-                rightMotorSpeed = rightMotorSpeed < 0 ? -.3: .3;
+            if(std::abs(rightMotorSpeed) > .5) {
+                rightMotorSpeed = rightMotorSpeed < 0 ? -.5: .5;
             }
             leftMotor.setSpeed(leftMotorSpeed);
             rightMotor.setSpeed(rightMotorSpeed);

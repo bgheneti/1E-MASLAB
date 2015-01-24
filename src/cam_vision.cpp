@@ -102,7 +102,7 @@ namespace vision{
 	  }
       }
       printf("red: x:%f, y:%f\n",X,Y);
-      double forwardDistance=height * tan(90-hViewAngle/2-angleDown+hViewAngle * (frameHeight-Y)/frameHeight);
+      double forwardDistance=height * tan(90-hViewAngle/2-angleDown+hViewAngle * (frameHeight-Y)/frameHeight)-cameraDistance;
       double leftDistance=forwardDistance * tan(30-60*X/frameWidth);
       Color color(red);
       std::complex<double> position(forwardDistance,leftDistance);
@@ -163,7 +163,7 @@ namespace vision{
   }
  
     void Cam::poll(){
-        std::cout << 1 << std::endl;
+        std::cout << "1" << std::endl;
 	VideoCapture cap(0);
 	assert(cap.isOpened());
 	//namedWindow( "Display window", WINDOW_AUTOSIZE );
@@ -173,7 +173,7 @@ namespace vision{
 	//std::cout << "processing Frame" << std::endl;
 	processFrame(testFrame, testOut);
 	Size outSize = Size(testOut.cols, testOut.rows);
-	std::cout << "outviding" << std::endl;
+	//std::cout << "outviding" << std::endl;
 	VideoWriter outVid("test.avi", CV_FOURCC('M','P','4','2'),10,outSize,true);
 	VideoWriter outVid1("test1.avi", CV_FOURCC('M','P','4','2'),10,outSize,true);
         Mat out;

@@ -67,8 +67,7 @@ namespace firmware{
 			//(1+msf/newRateConstant)*angularVelocity;
 		      p = (1 - k) * p;
 		      angle += angularVelocity;
-		      angle = fmod(angle,360);
-		      printf("total: %f\n",angle);
+		      angle = fmod(angle,360);		      
 		      if(angle > 180){
 			angle -= 360;
 		      }

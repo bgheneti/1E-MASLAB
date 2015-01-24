@@ -12,10 +12,11 @@ using namespace cv;
 namespace vision{
     class Cam{
         private:
-	    const double height=0.3429;
+	    const double height=0.3556;
 	    const double hViewAngle=40;
 	    const double vViewAngle=60;
 	    const double angleDown=25;
+	    const double cameraDistance=0.0762;
 	    int running;
             std::thread runner;
 	    void processFrame(Mat& inFrame);
