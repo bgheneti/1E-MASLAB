@@ -11,9 +11,9 @@ namespace firmware{
 	    mraa::Spi spi;
             mraa::Gpio slaveSelect;
             int slaveSelectPin;
-	    int running;
 	    std::thread runner;
-            int zero;
+            int running;
+	    int zero;
 	    const double newRateConstant;
 	    void poll();
         public:
@@ -22,7 +22,7 @@ namespace firmware{
 
 	    //start a thread for polling gyro data
 	    void startPoll();
-
+	    
 	    //stops polling gyro data
 	    void stopPoll();
 

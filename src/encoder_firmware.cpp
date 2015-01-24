@@ -4,6 +4,7 @@
 #include <cassert>
 #include <cmath>
 #include <thread>
+#include <iostream>
 
 #include "../include/encoder_firmware.h"
 
@@ -41,7 +42,7 @@ namespace firmware
     // Spawn a new thread to continuously poll the encoder
     void Encoder::startPolling() {
         running = true;
-	std::thread thr(&Encoder::poll, this);
+        std::thread thr(&Encoder::poll, this);
         std::swap(thr, runner);
     }
 
@@ -55,14 +56,16 @@ namespace firmware
     //
     // Returns the max of the stateTicks array because it is possible we skipped a state
     // by mistake somewhere.
-    int Encoder::getNumTicks() {
+    double Encoder::getDistance() {
         int maxTicks=0;
         for(int i=0; i<4; i++) {
             if(stateTicks[i] > maxTicks) {
                 maxTicks = stateTicks[i];
             }
         }
-        return maxTicks;
+        // 480 is ticks per rotation
+        // 0.0492125 is radius of wheel in meters
+        return ((double) maxTicks) / 480.0 * 0.0492125;
     }
 
     // Reset the number of ticks to 0.
