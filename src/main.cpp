@@ -16,6 +16,7 @@
 //#include "../include/cam.h"
 #include "../include/dropoff.h"
 #include "../include/pickup.h"
+#include "../include/arduino_firmware.h"
 int running = 1;
 
 void sig_handler(int signo) {
@@ -27,9 +28,17 @@ void sig_handler(int signo) {
 
 int main() {
     signal(SIGINT, sig_handler);
-    firmware::Motor pickupMotor(4, 5);
-    firmware::Servo sorter(10);
-    control::Pickup pickup(pickupMotor, sorter);
-    pickup.start();
+//    firmware::Motor pickupMotor(4, 5);
+//    firmware::Servo sorter(10);
+//    control::Pickup pickup(pickupMotor, sorter);
+//    pickup.start();
+
+	firmware::Arduino arduino(6);
+	arduino.startPoll();
+	for(int i=0; i<10; i++) {
+		std::cout << arduino.getBlockColor() << std::endl;
+		usleep(1000000);
+	}
+	arduino.stopPoll();
 }
 

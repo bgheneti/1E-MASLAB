@@ -2,7 +2,7 @@
 #define INCLUDE_COLOR_H_
 
 namespace utils {
-	enum Color {RED, GREEN};
+	enum Color {NONE, RED, GREEN};
 
 }
 
