@@ -30,9 +30,18 @@ int main() {
   firmware::Servo rightOpener = firmware::Servo(9);
   control::Dropoff leftStack(leftFloor, leftOpener, 1);
   control::Dropoff rightStack(rightFloor, rightOpener, -1);
+  rightOpener.off();
+  leftOpener.off();
+  rightStack.resetStack();
+  leftStack.resetStack();
+  usleep(10000000);
   rightStack.dropStack();
+  usleep(5000000);
+  rightStack.resetStack();
+  usleep(1000000);
   leftStack.dropStack();
-  leftFloor.off();
-  rightFloor.off();
+  usleep(5000000);
+  //leftFloor.off();
+  //rightFloor.off();
 }
 
