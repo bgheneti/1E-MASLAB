@@ -24,11 +24,18 @@ namespace vision{
 	    void addMat(Mat& a, Mat& b);
 	    void findCubes(Mat& inFrame);
 	    void processFrame(Mat& inFrame, Mat& outFrame);
+<<<<<<< HEAD
 	    std::vector<Block*> blocks;	    
         public:	    
+=======
+	    std::vector<double> expandPoint(int x, int y, Mat& inFrame);
+	    std::vector<double> findPoint(Mat& inFrame);
+	    std::vector<Block> blocks;
+        public:	  
+>>>>>>> color
 	    void startPoll();
 	    void stopPoll();
-	    std::vector<Block*> getBlocks();
+	    std::vector<Block> getBlocks();
     };
 }
 #endif

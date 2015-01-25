@@ -7,7 +7,7 @@ SRCEXT := cpp
 SOURCES := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
 CFLAGS := -g -std=c++11
-LIB := -lmraa `pkg-config opencv --cflags --libs` -lpthread
+LIB := -lmraa `pkg-config opencv --cflags --libs` -lpthread 
 INC := -I include
 
 $(TARGET): $(OBJECTS)
