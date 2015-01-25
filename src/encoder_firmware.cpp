@@ -65,7 +65,8 @@ namespace firmware
         }
         // 480 is ticks per rotation
         // 0.0492125 is radius of wheel in meters
-        return ((double) maxTicks) / 480.0 * 0.0492125;
+	// 7.0104 is the constant scaling factor from tuning
+        return ((double) maxTicks) / 480.0 * 0.0492125 * 7.0104;
     }
 
     // Reset the number of ticks to 0.

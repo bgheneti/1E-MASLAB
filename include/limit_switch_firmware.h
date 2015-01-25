@@ -11,7 +11,7 @@ namespace firmware {
 			LimitSwitch();
 			void startPoll();
 			void stopPoll();
-			void getState();
+			bool getState();
 
 	};
 }

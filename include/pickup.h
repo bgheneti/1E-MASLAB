@@ -2,9 +2,9 @@
 #define INCLUDE_PICKUP_H_
 
 #include "motor_firmware.h"
-#include "color_sensor_firmware.h"
+//#include "color_sensor_firmware.h"
 #include "servo_firmware.h"
-#include "limit_switch_firmware.h"
+//#include "limit_switch_firmware.h"
 #include "color.h"
 
 namespace control {
@@ -12,21 +12,17 @@ namespace control {
 
 		private:
 			firmware::Motor pickupMotor;
-			firmware::ColorSensor colorSensor;
 			firmware::Servo sorter;
-			firmware::LimitSwitch switch;
 			int numRedBlocks;
 			int numGreenBlocks;
 
 		public:
 			Pickup(firmware::Motor pickupMotor,
-			       firmware::ColorSensor colorSensor,
-			       firmware::Servo sorter,
-			       firmware::LimitSwitch switch);
+			       firmware::Servo sorter);
 
-			void startPickup();
+			void start();
 
-			int stopPickup();
+			void stop();
 
 			int numRedBlocksPickedUp();
 			int numGreenBlocksPickedUp();
