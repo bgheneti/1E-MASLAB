@@ -2,7 +2,7 @@
 #include <iostream>
 #include "mraa.hpp"
 namespace firmware {
-    Servo::Servo(int register) : i2c(6) {
+    Servo::Servo(int outputPin) : i2c(outputPin) {
     }
  
     // The servo position is measured from the neutral position.
@@ -12,6 +12,9 @@ namespace firmware {
         double duty = onTime * .00004;
         i2c.write(duty);     
     } 
+    void Servo::off() {
+	i2c.write(0.0);
+    }
 
 
 }
