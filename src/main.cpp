@@ -4,6 +4,7 @@
 #include <iostream>
 #include <thread>
 #include <chrono>
+#include <complex>
 
 #include "mraa.hpp"
 #include "../include/motor_firmware.h"
@@ -11,6 +12,8 @@
 #include "../include/servo_firmware.h"
 #include "../include/i2c_pwm_wrapper.h"
 #include "../include/drive_ctrl.h"
+//#include "../include/wallfollower.h"
+//#include "../include/cam.h"
 
 int running = 1;
 
@@ -27,18 +30,9 @@ int main() {
     firmware::Motor motorR(0, 1);
     firmware::Motor motorL(2, 3); 
     firmware::Motor pickupMotor(4, 5);
-//    pickupMotor.setSpeed(-.25);
-//    usleep(5000000);
-//    pickupMotor.stop();
 
-/*    motorR.setSpeed(.2);
-    motorL.setSpeed(.2);
-    usleep(5000000);
-    motorR.setSpeed(0.0);
-    motorL.setSpeed(0.0);
-*/
-
-    
+	pickupMotor.setSpeed(-.4);
+/*
     // Encoder setup
     firmware::Encoder encoderL(2, 3);
     encoderL.startPolling();
@@ -48,40 +42,35 @@ int main() {
     // Gyro setup
     firmware::Gyro gyro(10);
     gyro.startPoll();
-    drive::DriveTrain dt(motorL, motorR, encoderL, encoderR, gyro);
-    usleep(500000);
-    std::cout << "running" << std::endl;
-    dt.straightForDistance(.2);
-    dt.turnForDegrees(50.0);
-    std::cout << "running" << std::endl;
 
+    // Camera setup
+    vision::Cam cam;
+    cam.startPoll();
+
+    // Wall follower setup
+    drive::DriveTrain dt(motorL, motorR, encoderL, encoderR, gyro);
+    control::Wallfollower wallfollower(dt, rangefinderfront, rangefinderleft, rangefinderright);
+    // Main code
+    wallfollower.start();
+    while(running) {
+	std::vector<vision::Block> blocks = cam.getBlocks();
+	if(blocks.size() > 0) {
+		wallfollower.stop();
+		std::complex pos = blocks[0].getPosition();
+		double heading = std::arg(pos);
+		double distance = std::abs(pos);
+		dt.turnForDegrees(heading);
+		dt.straightForDistance(distance + .2);
+		wallfollower.start();
+	}
+		
+    	usleep(500000);
+    }
+
+    // Stop sensors
     encoderL.stopPolling();
     encoderR.stopPolling();
     gyro.stopPoll();
-
-/*
-    double speed = 0.25;
-    motorR.setSpeed(speed);
-    motorL.setSpeed(speed);
-    encoderL.startPolling();
-    encoderR.startPolling();
-    std::chrono::milliseconds sleep_time(10000);
-    std::this_thread::sleep_for(sleep_time);
-    encoderL.stopPolling(); 
-    encoderR.stopPolling(); 
-    printf("Left encoder reads: %f",  encoderL.getDistance());
-    printf("Right encoder reads: %f",  encoderR.getDistance());
-    motorR.stop();
-    motorL.stop();
- */   
-
-  /*  firmware::Servo servo = firmware::Servo(0);
-    servo.setServoPosition(-40.0);
-    std::chrono::milliseconds sleep_time(10000);
-    std::this_thread::sleep_for(sleep_time);
-    std::cout << "hi" << std::endl;
-    servo.setServoPosition(90.0);
-   */ 
-   
+*/
 }
 
