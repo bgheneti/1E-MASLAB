@@ -114,14 +114,9 @@ namespace vision{
 
   //sets entries in vector blocks to the closest red block and the closest green block
   void Cam::findCubes(Mat& inFrame){
-<<<<<<< HEAD
-    Mat_<Vec3b> greenFrame(240, 320, Vec3b(255,255,255));
-    Mat_<Vec3b> redFrame(240, 320, Vec3b(255,255,255));
-=======
     std::cout<<"find cubes"<<std::endl;
     Mat_<Vec3b> greenFrame(240, 320, Vec3b(0,0,0));
     Mat_<Vec3b> redFrame(240, 320, Vec3b(0,0,0));
->>>>>>> color
     //inFrame=redFrame;
     for(int row = 0; row < inFrame.rows; ++row) {
       uchar* inFramePos = inFrame.ptr(row);
@@ -129,18 +124,6 @@ namespace vision{
       uchar* greenFramePos = greenFrame.ptr(row);    
       for(int col = 0; col < inFrame.cols; col++) {
 	if(*(inFramePos+1)==255){
-<<<<<<< HEAD
-	  *(greenFramePos)=0;
-	  *(greenFramePos+1)=0;
-	  *(greenFramePos+2)=0;
-
-	}
-	else if(*(inFramePos+2)==255){
-	  *(redFramePos)=0;
-  	  *(redFramePos+1)=0;
-	  *(redFramePos+2)=0;
-
-=======
 	  *(greenFramePos)=255;
 	  *(greenFramePos+1)=255;
 	  *(greenFramePos+2)=255;
@@ -149,52 +132,23 @@ namespace vision{
 	  *(redFramePos)=255;
 	  *(redFramePos+1)=255;
 	  *(redFramePos+2)=255;
->>>>>>> color
 	}
 	inFramePos+=3;
 	redFramePos+=3;
 	greenFramePos+=3;
       }
     }
-<<<<<<< HEAD
-    SimpleBlobDetector::Params params;
-    params.minDistBetweenBlobs = -3.0;
-    params.minArea = 40.0;
-    params.filterByArea= true;
-    SimpleBlobDetector blob_detector(params);
-    vector<cv::KeyPoint> keypoints;
-=======
-    std::cout << inFrame.depth() << ", " << inFrame.channels() << std::endl;
-    
->>>>>>> color
+    //std::cout << inFrame.depth() << ", " << inFrame.channels() << std::endl;
+
     blocks.clear();
     double frameHeight=inFrame.rows;
     double frameWidth=inFrame.cols;
     int i=0;
-<<<<<<< HEAD
-    std::cout<<"finding keypoints"<<std::endl;
-    //Red Blocks
-
-    blob_detector.detect(redFrame, keypoints);
-    for (int i=0; i<keypoints.size()&&i<10; i++){
-      double X = keypoints[i].pt.x; 
-      double Y = keypoints[i].pt.y;
-      double radius = keypoints[i].size;
-      Y+=radius;
-      for(int x=std::max(0.0,X-1);x<std::min(X+2.0,frameWidth);x++){
-	for(int y=std::max(0.0,Y-1);y<std::min(Y+2.0,frameWidth);y++){
-	    inFrame.at<Vec3b>(Point(x,y))=Vec3b(255,0,0);
-	  }
-      }
-      printf("red: x:%f, y:%f\n",X,Y);
-      double forwardDistance=height * tan(90-hViewAngle/2-angleDown+hViewAngle * (frameHeight-Y)/frameHeight)-cameraDistance;
-=======
-   
     vector<double> point= findPoint(redFrame);
     if(point[0]!=-1){
       double X = point[0]; 
       double Y = point[1];
-      //printf("red: x:%f, y:%f\n",X,Y);
+      printf("red: x:%f, y:%f\n",X,Y);
       
       for(int x=std::max(0.0,X-1);x<std::min(X+2,frameWidth);x++){
 	for(int y=std::max(0.0,Y-1);y<std::min(Y+2,frameWidth);y++){
@@ -203,7 +157,6 @@ namespace vision{
       }
 
       double forwardDistance=height * tan(90-hViewAngle/2-angleDown+hViewAngle * (frameHeight-Y)/frameHeight);
->>>>>>> color
       double leftDistance=forwardDistance * tan(30-60*X/frameWidth);
       Color color(red);
       std::complex<double> position(forwardDistance,leftDistance);
@@ -211,34 +164,17 @@ namespace vision{
       blocks.push_back(block);
       //std::cout<<"made block"<<std::endl;
     }
-
-<<<<<<< HEAD
-    //Green Blocks
-    
-    blob_detector.detect(greenFrame, keypoints);
-    for (int i=0; i<keypoints.size()&&i<10; i++){
-      double X = keypoints[i].pt.x; 
-      double Y = keypoints[i].pt.y;
-      double radius = keypoints[i].size;
-      Y+=radius;
-=======
     point= findPoint(redFrame);
     if(point[0]!=-1){
       double X = point[0]; 
       double Y = point[1];
-      //printf("green: %d, x:%f, y:%f\n",i,X,Y);
+      printf("green: %d, x:%f, y:%f\n",i,X,Y);
 
->>>>>>> color
       for(int x=std::max(0.0,X-1);x<std::min(X+2,frameWidth);x++){
 	for(int y=std::max(0.0,Y-1);y<std::min(Y+2,frameWidth);y++){
 	      inFrame.at<Vec3b>(Point(x,y))=Vec3b(255,0,0);
 	  }
       }
-<<<<<<< HEAD
-      printf("green:x:%f, y:%f\n",X,Y);
-=======
-
->>>>>>> color
       double forwardDistance=height * tan(90-hViewAngle/2-angleDown+hViewAngle * (frameHeight-Y)/frameHeight);
       double leftDistance=forwardDistance*tan(30-60*X/frameWidth);
       Color color(red);
@@ -273,13 +209,8 @@ namespace vision{
   }
  
     void Cam::poll(){
-<<<<<<< HEAD
-        std::cout << "1" << std::endl;
-	VideoCapture cap(0);
-=======
         std::cout << 1 << std::endl;
-	VideoCapture cap(1);
->>>>>>> color
+	VideoCapture cap(0);
 	assert(cap.isOpened());
 	//namedWindow( "Display window", WINDOW_AUTOSIZE );
 	Mat testFrame;
@@ -297,7 +228,7 @@ namespace vision{
 	assert(outVid1.isOpened());
 	//std::cout << "windowing" << std::endl;
 	//imshow( "Display window", testOut);
-	std::cout << running << std::endl;
+	//std::cout << running << std::endl;
 	while (running) {
 	    Mat frame;
 	    cap >> frame;
