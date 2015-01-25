@@ -51,8 +51,8 @@ int main() {
     drive::DriveTrain dt(motorL, motorR, encoderL, encoderR, gyro);
     usleep(500000);
     std::cout << "running" << std::endl;
-    dt.straightForDistance(.2);
-    dt.turnForDegrees(50.0);
+    dt.straightForDistance(1.0);
+ //   dt.turnForDegrees(50.0);
     std::cout << "running" << std::endl;
 
     encoderL.stopPolling();
