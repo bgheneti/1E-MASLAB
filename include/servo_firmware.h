@@ -15,6 +15,7 @@ namespace firmware {
             // The servo position is measured from the neutral position.
             // +90 degrees is counterclockwise and -90 degrees is clockwise.
             void setServoPosition(double degrees);
+	    void off();
    };
 }
 #endif
