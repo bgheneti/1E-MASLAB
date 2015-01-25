@@ -8,7 +8,7 @@ namespace firmware {
 		public:
 			void startPoll();
 			void stopPoll();
-			void getColor();	
+			utils::Color getColor();	
 
 	};
 
