@@ -3,6 +3,8 @@
 
 #include "mraa.hpp"
 #include <thread>
+#include <sys/time.h>
+
 namespace firmware{
     class Gyro {
         private:
@@ -14,18 +16,19 @@ namespace firmware{
 	    std::thread runner;
             int running;
 	    int zero;
+	    int init;
+	    double p;
+	    //double bias;
+	    double biasCalcRuns;
 	    const double newRateConstant;
-	    void poll();
+	    struct timeval tv;
         public:
+	    double deltaTime;
 	    //Creates a new gyro object that has a slave select pin
 	    Gyro(int slaveSelectPin);
 
-	    //start a thread for polling gyro data
-	    void startPoll();
-	    
-	    //stops polling gyro data
-	    void stopPoll();
-
+	    void poll(mraa::Spi& spi);
+	    double bias;
 	    //returns the current angle in degrees
 	    double getAngle();
 

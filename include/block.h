@@ -2,6 +2,7 @@
 #define INCLUDE_BLOCK_H_
 
 #include <complex>   
+#include <vector>
 
 namespace vision{
 
@@ -13,12 +14,13 @@ namespace vision{
     class Block{
         private:
 	    const double dimension;
-	    std::complex<double> position;
+	    double distance;
+	    double angle;
 	    Color cubeColor;
         public:
-	    Block();
-	    Block(std::complex<double> pos, Color color);
-	    std::complex<double> getPosition();
+	    Block(std::vector<double> position, Color color);
+	    double getDistance();
+	    double getAngle();
 	    Color getColor();
     };
 }

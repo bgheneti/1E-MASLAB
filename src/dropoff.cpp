@@ -8,10 +8,12 @@ namespace control {
 	                                        dir(dir) {}
 	void Dropoff::dropStack() {
 	        floor.setServoPosition(90.0*dir);	
+		opener.setServoPosition(0.0);
 	}
 
 	void Dropoff::resetStack() {
 		floor.setServoPosition(45.0*dir);
+		opener.setServoPosition(-90.0);
 	}
 
 }

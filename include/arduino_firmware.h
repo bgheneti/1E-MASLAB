@@ -18,14 +18,11 @@ namespace firmware {
 	class Arduino {
 		private:
 			mraa::Gpio ss;
-			mraa::Spi spi;
 			utils::Color blockColor;
-			void poll();
 			bool running;
 		public:
 			Arduino(int gpioPin);
-			void stopPoll();
-			void startPoll();
+			void poll(mraa::Spi& spi);
 			utils::Color getBlockColor();
 
 	};

@@ -1,24 +1,23 @@
 #include "../include/arduino_firmware.h"
 #include <thread>
+#include <iostream>
 
 namespace firmware {
 
 	Arduino::Arduino(int gpioPin) : ss(gpioPin), 
-					spi(0),
+		//			spi(0),
 					blockColor(utils::Color::NONE), 
 					running(false) {
 		ss.dir(mraa::Dir(0)); // DIR_OUTPUT
 		ss.write(1);
-		spi.frequency(2000000);
-		spi.bitPerWord(8);
 	}
 
 	utils::Color Arduino::getBlockColor() {
 		return blockColor;
 	}
 
-	void Arduino::poll() {
-	    while(running) {
+	void Arduino::poll(mraa::Spi& spi) {
+		std::cout << "polling arduino" << std::endl;
 		char writeBuf[7] = {CLRLO, CLRHI, REDLO, REDHI,
 				    GRNLO, GRNHI, 0xfe};
 		char* rxBuf;
@@ -40,18 +39,7 @@ namespace firmware {
 			blockColor = utils::Color::NONE;
 		}
 		free(rxBuf);
-		usleep(250000);
-            }
 	}	
 	
-	void Arduino::startPoll() {
-		running = true;
-		std::thread thr(&Arduino::poll, this);
-		thr.detach();
-	}
-
-	void Arduino::stopPoll() {
-		running = false;
-	}
 
 }
