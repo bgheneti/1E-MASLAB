@@ -1,6 +1,8 @@
 #include "../include/wallfollower.h"
 #include <algorithm>
+#include <iostream>
 #include <cmath>
+#include <thread>
 
 namespace control{
   
@@ -21,10 +23,11 @@ namespace control{
     frontRF.getHighestProbDistance();
     leftRF.getHighestProbDistance();
     rightRF.getHighestProbDistance();
-    double front = frontRF.getHighestProbDistance();
+    double front = -1;//frontRF.getHighestProbDistance();
     double left = leftRF.getHighestProbDistance();
     double right = rightRF.getHighestProbDistance();
     
+    std::cout << front << "\t" << left << "\t" << right << std::endl;
     double distanceFromWall = right;
     double otherDistance = left;
     if (dir == -1){
@@ -32,21 +35,25 @@ namespace control{
       otherDistance = right;
     }
     
-    bool wd = (distanceFromWall != -1);
-    bool od = (otherDistance != -1);
-    bool f = (front != -1);
+    bool wd = (distanceFromWall != -1 && distanceFromWall < std::max(30.0, dist + 10));
+    bool od = (otherDistance != -1 && distanceFromWall < std::max(30.0, dist + 10));
+    bool f = (front != -1 && distanceFromWall < std::max(30.0, dist + 10));
     
     if (!wd && !od && !f){
-      driveTrain.straightForDistance(std::min(dist/4, 5.0));
+      std::cout << "all clear" << std::endl;
+      driveTrain.straightForDistance(std::min(dist/400, 0.05));
+      std::cout << "done" << std::endl;
     }
     else if (wd && !od && !f){
-      if (distanceFromWall - dist > std::min(dist/8, 2.5)){ //if far from the wall
+      std::cout << "next to wall only" << std::endl;
+      if (distanceFromWall - dist > std::min(dist/800, 0.025)){ //if far from the wall
         driveTrain.turnForDegrees(10*dir);
       }
-      else if (dist - distanceFromWall > std::min(dist/8, 2.5)){ //if close to the wall
+      else if (dist - distanceFromWall > std::min(dist/800, 0.025)){ //if close to the wall
         driveTrain.turnForDegrees(-10*dir);
       }
-      driveTrain.straightForDistance(std::min(dist/4, 5.0));
+      driveTrain.straightForDistance(std::min(dist/400, 0.05));
+      std::cout << "done" << std::endl;
     }
     else if (!wd && od && !f){
       if (od > 10){
@@ -74,7 +81,7 @@ namespace control{
       else if (wd - od > 5){
         driveTrain.turnForDegrees(10*dir);
       }
-      driveTrain.straightForDistance(std::min(dist/4, 5.0));
+      driveTrain.straightForDistance(std::min(dist/400, 0.05));
     }
     else if (!wd && od && f){
       driveTrain.turnForDegrees(-10*dir);
@@ -84,25 +91,27 @@ namespace control{
     }
     
     
-    
+    std::cout << "DONE" << std::endl;
     
   }
   
   void Wallfollower::runner(){
     while (running){
       step();
-      usleep(50000);
-      
+      //usleep(50000);
+      std::cout << "running" << std::endl;
     }
   }
   
   void Wallfollower::start(){
     running = 1;
-    runner();
+    r = std::thread(&Wallfollower::runner, this);
+    std::cout << "started running " << std::endl;
   }
   
   void Wallfollower::stop(){
     running = 0;
+    r.~thread();
   }
   
   void Wallfollower::setDist(int d){

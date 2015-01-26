@@ -11,10 +11,10 @@
 #include <time.h>
 #include <cmath>
 
-#define SPEED .1
-#define P .02
-#define I 0.00001
-#define D -.5
+#define SPEED .2
+#define P (.0025 * 1.5)
+#define I (0.0000015 * 1.5)
+#define D (-0.05 *1.5)
 
 namespace drive {
     

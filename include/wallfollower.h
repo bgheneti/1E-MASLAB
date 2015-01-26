@@ -4,6 +4,7 @@
 #include "mraa.hpp"
 #include "drive_ctrl.h"
 #include "rangefinder_firmware.h"
+#include <thread>
 
 namespace control{
   // a class for making the robot follow walls
@@ -17,6 +18,7 @@ namespace control{
       bool running;
       int dir;
       double dist;
+      std::thread r;
     public:
       //constructor
       Wallfollower(drive::DriveTrain &driveTrain,

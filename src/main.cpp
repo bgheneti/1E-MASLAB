@@ -4,6 +4,7 @@
 #include <iostream>
 #include <thread>
 #include <chrono>
+#include <thread>
 
 #include "mraa.hpp"
 #include "../include/motor_firmware.h"
@@ -32,16 +33,26 @@ int main() {
     
     firmware::Motor motorL(2, 3);
     firmware::Motor motorR(0, 1);
-    
+    motorL.setSpeed(0);
+    motorR.setSpeed(0);
+    sleep(1);
     firmware::Gyro gyro(10);
     
     drive::DriveTrain driveTrain(motorL, motorR, encoderL, encoderR, gyro);
     
-    firmware::Rangefinder front(-1, -1, -1);
+    firmware::Rangefinder front(0, 0, 0);
     firmware::Rangefinder left(0, 8, 16);
     firmware::Rangefinder right(1, 15, 17);
-    
+    driveTrain.straightForDistance(0.01);
+    std::cout << "asdf" << std::endl;
+    sleep(1);
     control::Wallfollower wf = control::Wallfollower(driveTrain, front, left, right);
+    wf.start();
+    
+    while(running){usleep(5000);}
+    motorL.setSpeed(0);
+    motorR.setSpeed(0);
+    wf.stop();
     
     // Motor setup
 /*
