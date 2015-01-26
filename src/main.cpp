@@ -17,11 +17,9 @@
 //#include "../include/cam.h"
 #include "../include/dropoff.h"
 #include "../include/pickup.h"
-#include "../include/arduino_firmware.h"
 #include "../include/gyro_firmware.h"
 #include "../include/drive_ctrl.h"
 #include "../include/block.h"
-#include "../include/spi_wrapper.h"
 
 #define MS 1000
 #define timeout 50
@@ -37,13 +35,10 @@ void sig_handler(int signo) {
 
 int main() {
     signal(SIGINT, sig_handler);
-	firmware::Arduino arduino(9);
     	firmware::Gyro gyro(10);
-	firmware::SpiWrapper spiWrapper(gyro, arduino);
-	spiWrapper.startPoll();
+	gyro.startPoll();
 	usleep(1000000);
 	for(int i=0; i<10; i++) {
-		std::cout << "block color " << arduino.getBlockColor() << std::endl;
 		std::cout << "gyro angle " << gyro.getAngle() << std::endl; 
 		usleep(1000000);
 	}
@@ -106,6 +101,6 @@ int main() {
     driveCtrl.straightForDistance(distance);                                                          
   }
 */
-  spiWrapper.stopPoll();
+  gyro.stopPoll();
 }
 
