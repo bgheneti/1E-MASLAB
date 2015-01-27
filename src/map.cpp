@@ -354,6 +354,7 @@ namespace map {
                 }
             }
             utils::Point node((*minIt).x, (*minIt).y);
+            if(node.equals(goal)) {break;}
             queue.erase(minIt);
 
             for(int dY=-1; dY<=1; dY++) {
@@ -370,11 +371,17 @@ namespace map {
             }
         }
 
+        std::vector<utils::Point> path;
+        utils::Point node = goal;
+        while(!node.equals(utils::Point())) {
+            path.push_back(node);
+            node = prev[node.x*MAXY + node.y];
+        }
+
 
         delete[] dist;
         delete[] prev;
-        std::vector<utils::Point> result;
-        return result;    
+        return path;    
     }
 
     void Map::print() {
