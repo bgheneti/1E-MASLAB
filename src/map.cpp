@@ -37,26 +37,35 @@ namespace map {
     }
 
     void Map::markPassable() {
+        for(int i=0; i < passableElements.size(); i++) {
+            if(grid[passableElements[i].y][passableElements[i].x] == PASSABLE) {
+                grid[passableElements[i].y][passableElements[i].x] = EMPTY; 
+            }
+        }
+        updatePassable();
+        for(int i=0; i < passableElements.size(); i++) {
+            grid[passableElements[i].y][passableElements[i].x] = PASSABLE;
+        }
+    }
+
+    void Map::updatePassable() {
+        passableElements.clear();
         for(int y=0; y<grid.size(); y++) {
             for(int x=0; x<grid[0].size(); x++) {
-                if(grid[y][x] != EMPTY) continue;
+                if(!isGround(grid[y][x])) continue;
                 bool passable = true;
                 for(int deltaY=-2; deltaY<=2; deltaY++) {
                     for(int deltaX=-2; deltaX<=2; deltaX++) {
                         if(y+deltaY<0 || y+deltaY>=grid.size() ||
                                 x+deltaX<0 || x+deltaX>=grid[0].size() ||
-                                (grid[y+deltaY][x+deltaX]!=EMPTY &&
-                                 grid[y+deltaY][x+deltaX]!=PASSABLE &&
-                                 grid[y+deltaY][x+deltaX]!=STACK_0R &&
-                                 grid[y+deltaY][x+deltaX]!=STACK_1R &&
-                                 grid[y+deltaY][x+deltaX]!=STACK_2R &&
-                                 grid[y+deltaY][x+deltaX]!=STACK_3R)) {
+                                !(isStackToPickUp(grid[y+deltaY][x+deltaX]) || 
+                                  isGround(grid[y+deltaY][x+deltaX]))) {
                             passable=false;
                             break;
                         }
                     }
                 }
-                if(passable) grid[y][x] = PASSABLE;
+                if(passable) passableElements.push_back(utils::Point(x, y));
             }
         }
 
@@ -263,6 +272,14 @@ namespace map {
             }
         }
 
+    }
+
+    bool Map::isGround(Element elt) {
+        return elt==EMPTY || elt==HOMEBASE || elt==NO_MAN_ZONE || elt==PASSABLE;
+    }
+
+    bool Map::isStackToPickUp(Element elt) {
+        return elt==STACK_0R || elt==STACK_1R || elt==STACK_2R || elt==STACK_3R;
     }
 
     std::vector<std::vector<Element> > Map::getGrid() {

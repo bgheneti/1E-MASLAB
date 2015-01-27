@@ -30,12 +30,17 @@ namespace map {
             utils::Point botLocation;
             std::vector<utils::Point> walls; // even start point and odd end point
             std::vector<utils::Point> homebase; // vertices in the polygon
-            void parseMapFile(std::string filename);
+            std::vector<utils::Point> passableElements;
             utils::AxisAlignedBoundingBox fieldBB;
+
+            void parseMapFile(std::string filename);
             void initializeGrid();
             void fillHomeBase();
             void fillObjects();
+            void updatePassable();
             void markPassable();
+            bool isGround(Element elt);
+            bool isStackToPickUp(Element elt);
 
         public:
             Map(std::string filename);
