@@ -24,6 +24,7 @@ void sig_handler(int signo) {
 int main() {
     signal(SIGINT, sig_handler);
     // Motor setup
+
     firmware::Motor motorR(0, 1);
     firmware::Motor motorL(2, 3); 
     firmware::Motor pickupMotor(4, 5);
