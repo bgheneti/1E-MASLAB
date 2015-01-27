@@ -53,6 +53,7 @@ namespace map {
             void setLocationRelative(double deltaX, double deltaY);
             void setLocationRelative(int deltaX, int deltaY);
             utils::Point whereToDropStack(Zone zone);
+            std::vector<utils::Point> getPathTo(utils::Point goal);
             void print();
 
     };

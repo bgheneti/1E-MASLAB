@@ -329,6 +329,54 @@ namespace map {
 
     }
 
+    std::vector<utils::Point> Map::getPathTo(utils::Point goal) {
+        double*       dist = new double      [grid.size()*grid[0].size()];
+        utils::Point* prev = new utils::Point[grid.size()*grid[0].size()];
+        std::vector<utils::Point> queue;
+        const int MAXY = grid.size();
+        
+        dist[botLocation.x*MAXY + botLocation.y] = 0;
+        for(int i=0; i<passableElements.size(); i++) {
+            if(!botLocation.equals(passableElements[i])) {
+                dist[passableElements[i].x*MAXY + passableElements[i].y] = 500; // dist will never be 500m from source
+            }
+            queue.push_back(passableElements[i]);
+        }
+
+        while(queue.size() > 0) {
+            std::vector<utils::Point>::iterator minIt;
+            double minDistance = 501;
+            for(std::vector<utils::Point>::iterator it = queue.begin(); it != queue.end(); it++) {
+                double newDistance = dist[(*it).x*MAXY + (*it).y];
+                if(newDistance < minDistance) {
+                    minDistance = newDistance;
+                    minIt = it;
+                }
+            }
+            utils::Point node((*minIt).x, (*minIt).y);
+            queue.erase(minIt);
+
+            for(int dY=-1; dY<=1; dY++) {
+                for(int dX=-1; dX<=1; dX++) {
+                    if(dX==0 && dY==0) {continue;}
+                    utils::Point otherPoint(node.x + dX, node.y + dY);
+                    double alt = minDistance + sqrt(dX*dX + dY*dY);
+                    double otherDist = dist[otherPoint.x*MAXY + otherPoint.y];
+                    if(alt < otherDist) {
+                        dist[otherPoint.x*MAXY + otherPoint.y] = alt;
+                        prev[otherPoint.x*MAXY + otherPoint.y] = node;
+                    }
+                }
+            }
+        }
+
+
+        delete[] dist;
+        delete[] prev;
+        std::vector<utils::Point> result;
+        return result;    
+    }
+
     void Map::print() {
         for(int y=0; y<grid.size(); y++) {
             for(int x=0; x<grid[y].size(); x++) {

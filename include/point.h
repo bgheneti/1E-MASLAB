@@ -22,6 +22,10 @@ namespace utils {
             y = (y-minY)*6.096;
         }
         
+        bool equals(utils::Point otherPoint) {
+            return x==otherPoint.x && y==otherPoint.y;
+        }
+
         // Return the string representation of the point
         std::string toString() {
             std::ostringstream stringStream;
