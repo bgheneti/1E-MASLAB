@@ -5,8 +5,8 @@
 #define PI 3.14159
 namespace map{
   AngleLocalizer::AngleLocalizer(firmware::Rangefinder &rf,
-    drive::DriveTrain &dt, Map &probMap):
-    rf(rf), dt(dt), probMap(probMap){
+    drive::DriveTrain &dt, Map m):
+    rf(rf), dt(dt){
       //initialize a blank copy of expected
       expected = std::vector<double>(720, 0);
       
@@ -30,12 +30,12 @@ namespace map{
     double currX = xLoc;
     double currY = yLoc;
     double stepX, stepY;
-    
+    std::cout << "setLocation" << xLoc << ", " << yLoc << std::endl;
     //for each angle
     for(int th = 0; th < 360; th++){
       //for this angle, where th=0 is directly upwards, the change in x and y
-      stepX = sin(th);
-      stepY = cos(th);
+      stepX = sin(th*PI/180);
+      stepY = cos(th*PI/180);
       
       //step until a wall is found.
       while (probMap[(int)currY][(int)currX] == 0){
@@ -51,14 +51,15 @@ namespace map{
       currX = xLoc;
       currY = yLoc;
     }
-    
+    std::cout << "location set" << std::endl;
   }
   
   int AngleLocalizer::getMax(std::vector<double> sta, std::vector<double> dyn){
+    std::cout << "getMax" << std::endl;
     std::vector<double> res(360, 0);
     double max = 0;
     int argmax = 0;
-    
+    std::cout << "getMax starting loop" << std::endl;
     for (int n = 0; n < 360; n++){
       for (int m = 0; m < 360; m++){
         res[n] += dyn[m]*sta[m+n];
@@ -69,23 +70,25 @@ namespace map{
         argmax = n;
       }
     }
-    
+    std::cout << "max gotten" << std::endl;
     return argmax;
   }
   
   int AngleLocalizer::getAngle(int numReadings){
+    std::cout << "getAngle" << std::endl;
     std::vector<double> readings(360, 0);
     double stepTh = 360.0 / numReadings;
     double currTh = 0;
+    std::cout << "stepping " << stepTh << std::endl;
     
     while(currTh < 360){
       for (int i = 0; i < 10; i++){rf.getHighestProbDistance();}
       readings[(int)currTh] = rf.getHighestProbDistance();
       dt.turnForDegrees(stepTh);
       currTh += stepTh;
-      
+      std::cout << "reached " << currTh << std::endl;;
     }
-    
+    std::cout << "done turning" << std::endl;
     return getMax(expected, readings);
   }
 }

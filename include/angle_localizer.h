@@ -22,7 +22,7 @@ namespace map{
     public:
       AngleLocalizer(firmware::Rangefinder &rf,
         drive::DriveTrain &dt,
-        Map &probMap);
+        Map m);
       //must be called so that the localizer can calculate expected distances
       void setLocation(int xl, int yl);
       

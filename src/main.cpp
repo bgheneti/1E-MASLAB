@@ -11,6 +11,8 @@
 #include "../include/servo_firmware.h"
 #include "../include/i2c_pwm_wrapper.h"
 #include "../include/drive_ctrl.h"
+#include "../include/rangefinder_firmware.h"
+#include "../include/angle_localizer.h"
 
 int running = 1;
 
@@ -43,22 +45,30 @@ int main() {
     // Encoder setup
     firmware::Encoder encoderL(2, 3);
     encoderL.startPolling();
-    firmware::Encoder encoderR(4, 5);
+    firmware::Encoder encoderR(5, 4);
     encoderR.startPolling();
 
     // Gyro setup
     firmware::Gyro gyro(10);
     gyro.startPoll();
     drive::DriveTrain dt(motorL, motorR, encoderL, encoderR, gyro);
-    usleep(500000);
-    std::cout << "running" << std::endl;
-    dt.straightForDistance(1.0);
+    
+    firmware::Rangefinder rf(1, 8, 17);
+    
+    map::Map m("");
+    
+    map::AngleLocalizer al(rf, dt, m);
+    
+    
+    //usleep(500000);
+    //std::cout << "running" << std::endl;
+    //dt.straightForDistance(1.0);
  //   dt.turnForDegrees(50.0);
-    std::cout << "running" << std::endl;
+    //std::cout << "running" << std::endl;
 
-    encoderL.stopPolling();
-    encoderR.stopPolling();
-    gyro.stopPoll();
+    //encoderL.stopPolling();
+    //encoderR.stopPolling();
+    //gyro.stopPoll();
 
 /*
     double speed = 0.25;
