@@ -290,12 +290,14 @@ namespace map {
         utils::Point stackPoint(x, y);
         stacks[4].push_back(stackPoint);
         grid[stackPoint.y][stackPoint.x] = STACK_US;
+        markPassable();
     }
 
     void Map::putDownStack(int x, int y) {
         utils::Point stackPoint(x, y);
         stacks[4].push_back(stackPoint);
         grid[y][x] = STACK_US;
+        markPassable();
 
     }
 
