@@ -18,8 +18,6 @@ namespace map {
 
     Map::Map(std::string filename) {
         // Initialize temp structures for the map
-        std::vector<utils::Point> walls; // even start point and odd end point
-        std::vector<utils::Point> homebase; // vertices in the polygon
         stacks.resize(5);
 
         // Now parse the file and populate structures using map format coords

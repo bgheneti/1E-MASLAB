@@ -26,6 +26,8 @@ namespace map {
             std::vector<std::vector<Element> > grid;
             std::vector<std::vector<utils::Point> > stacks;
             utils::Point botLocation;
+            std::vector<utils::Point> walls; // even start point and odd end point
+            std::vector<utils::Point> homebase; // vertices in the polygon
 
         public:
             Map(std::string filename);
