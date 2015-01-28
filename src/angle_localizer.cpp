@@ -7,12 +7,17 @@ namespace map{
   AngleLocalizer::AngleLocalizer(firmware::Rangefinder &front,
     firmware::Rangefinder &right, drive::DriveTrain &dt, Map m):
     front(front), right(right), dt(dt){
+      std::cout << "1" << std::endl;
       //initialize a blank copy of expected
       expected = std::vector<double>(720, 0);
-      
+      std::cout << "2" << std::endl;
       //copy grid from map into probMap
       std::vector<std::vector<Element>> g = m.getGrid();
+      std::vector<double> a = std::vector<double>(0, g[0].size());
+      //probMap = std::vector<std::vector<double>>(std::vector<double>(0, g[0].size()), g.size());
+      
       Element e;
+      std::cout << "3" << std::endl;
       for (int r = 0; r < g.size(); r++){
         for (int c = 0; c < g[0].size(); c++){
           e = g[r][c];
@@ -21,7 +26,7 @@ namespace map{
           
         }
       }
-      
+      std::cout << "4" << std::endl;
   }
   
   void AngleLocalizer::setLocation(int xl, int yl){
@@ -75,7 +80,7 @@ namespace map{
   }
   
   int AngleLocalizer::getAngle(int numReadings){
-    return getAngle(numReaedings, 0, 360);
+    return getAngle(numReadings, 0, 360);
   }
   
   int AngleLocalizer::getAngle(int numReadings, int lowerBound, int upperBound){

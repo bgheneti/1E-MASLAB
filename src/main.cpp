@@ -55,10 +55,11 @@ int main() {
     
     firmware::Rangefinder front(0, 6, 16);
     firmware::Rangefinder right(1, 8, 17);
-    map::Map m("../test_map.txt");
+    
+    map::Map m("test_map.txt");
     
     map::AngleLocalizer al(front, right, dt, m);
-    
+    std::cout << "daasf" << std::endl;
     
     //usleep(500000);
     //std::cout << "running" << std::endl;

@@ -4,6 +4,7 @@
 #include "rangefinder_firmware.h"
 #include "drive_ctrl.h"
 #include "mraa.hpp"
+#include "map.h"
 #include <vector>
 #include <math.h>
 #include <iostream>
@@ -19,7 +20,7 @@ namespace map{
       int xLoc;
       int yLoc;
       std::vector<double> expected;
-      std::vector<std::vector<double>> map;
+      std::vector<std::vector<double>> probMap;
     public:
       AngleLocalizer(firmware::Rangefinder &front,
         firmware::Rangefinder &right,
@@ -29,7 +30,7 @@ namespace map{
       void setLocation(int xl, int yl);
       
       //returns the shift of indices that most likely yields static from dynamic
-      int getMax(std::vector<double> sta, std::vector<double> dyn)nt lowerBound, int upperBound;
+      int getMax(std::vector<double> sta, std::vector<double> dyn, int lowerBound, int upperBound);
       
       //get most probable heading
       //degrees
