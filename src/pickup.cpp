@@ -29,11 +29,17 @@ namespace control {
 		usleep(10000);
 	      }
 	      if(colorSensor.getColor()==utils::Color::RED){
-		sorter.setServoPosition(SORT_CENTER + SORT_DELTA);
+		for(int delta=0;delta<SORT_DELTA+1;delta++){
+		  sorter.setServoPosition(SORT_CENTER + delta);
+		  usleep(10000);
+		}
 		numRedBlocks+=1;
 	      }
 	      else if(colorSensor.getColor()==utils::Color::GREEN){
-		sorter.setServoPosition(SORT_CENTER - SORT_DELTA);
+		for(int delta=0;delta<SORT_DELTA+1;delta++){
+                  sorter.setServoPosition(SORT_CENTER + delta);
+                  usleep(10000);
+                }
 		numGreenBlocks+=1;
 	      }
 	      usleep(3000000);
@@ -66,7 +72,7 @@ namespace control {
 	  if(stackColor==utils::Color::RED){
 	    numRedBlocks=0;
 	  }
-	  else{
+	  else if(stackColor==utils::Color::GREEN){
 	    numGreenBlocks=0;
 	  }
 	}

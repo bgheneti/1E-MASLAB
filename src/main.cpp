@@ -34,101 +34,57 @@ void sig_handler(int signo) {
 
 int main() {
     signal(SIGINT, sig_handler);
-    /*
-    firmware::Gyro gyro(10);
-	gyro.startPoll();
-	
-	//vision::Cam cam;
-	//cam.startPoll();
-	//usleep(1000000);
-	for(int i=0; i<10; i++) {
-		std::cout << "gyro angle " << gyro.getAngle() << std::endl; 
-		usleep(1000000);
-	}
-	
-    */
-    firmware::Motor leftMotor(2,3);
-    firmware::Motor rightMotor(0,1);
-    leftMotor.setSpeed(0.5);
-    rightMotor.setSpeed(0.5);
-    usleep(6000000);
-    leftMotor.setSpeed(0);
-    rightMotor.setSpeed(0);
-    /*
-    firmware::Encoder leftEncoder(2,3);
-    firmware::Encoder rightEncoder(5,4);
-    drive::DriveTrain driveCtrl(leftMotor,rightMotor,leftEncoder,rightEncoder,gyro);
-    driveCtrl.straightForDistance(1.0);
    
-    //bool found=false;
-    //int time=10 * timeout * MS;
-    //std::vector<vision::Block> blocks;
-    */
-    /*
-  firmware::Motor pickupMotor = firmware::Motor(4,5);
-  firmware::Servo sorter = firmware::Servo(10);
-  firmware::LimitSwitch limitSwitch = firmware::LimitSwitch(0);
-  firmware::ColorSensor colorSensor = firmware::ColorSensor(1);
-  control::Pickup pickup = control::Pickup(pickupMotor,sorter,limitSwitch, colorSensor);
-  pickup.start();
-  usleep(60000000);
-  pickup.stop();
-  pickupMotor.setSpeed(0);
-  
-  firmware::Servo rightFloor = firmware::Servo(6);
-  firmware::Servo leftFloor = firmware::Servo(7);
-  firmware::Servo leftOpener = firmware::Servo(9);
-  firmware::Servo rightOpener = firmware::Servo(8);
-  control::Dropoff leftStack(leftFloor, leftOpener, 1);
-  control::Dropoff rightStack(rightFloor, rightOpener, -1);
-  rightOpener.off();
-  leftOpener.off();
-  rightStack.resetStack();
-  leftStack.resetStack();
-  usleep(10000000);
-  rightStack.dropStack();
-  usleep(5000000);
-  rightStack.resetStack();
-  usleep(1000000);
-  leftStack.dropStack();
-  usleep(5000000);
-  leftFloor.off();
-  rightFloor.off();
-  */
-    /*
-  while(time>0){
-    std::cout<< "block"<<std::endl;
+    // Set up gyro 
+    firmware::Gyro gyro(10);
+    gyro.startPoll();
+    usleep(1000000);
+    
+    // Initialize motors
+    firmware::Motor leftMotor(0, 1);
+    firmware::Motor rightMotor(2, 3);
+   
+    // Set up encoders 
+    firmware::Encoder leftEncoder(3,2);
+    firmware::Encoder rightEncoder(4,5);
+    drive::DriveTrain driveCtrl(leftMotor,rightMotor,leftEncoder,rightEncoder,gyro);
+   
+    // Set up pickup 
+    firmware::Motor pickupMotor = firmware::Motor(4,5);
+    firmware::Servo sorter = firmware::Servo(10);
+    firmware::LimitSwitch limitSwitch = firmware::LimitSwitch(0);
+    firmware::ColorSensor colorSensor = firmware::ColorSensor(1);
+    control::Pickup pickup = control::Pickup(pickupMotor,sorter,limitSwitch, colorSensor);
 
-    blocks = cam.getBlocks();
-    if(blocks.size()>0){
-      found=true;
-      std::cout<<"found block"<<std::endl;
-      break;
-    }
-    usleep(timeout * MS);
-    time-= timeout * MS;
-
-  }
-  std::cout<<"DONE WITH WHILE"<<std::endl;
-  //gyro.stopPoll();                                                                                  
-  cam.stopPoll();
-
-  if(found==true){
-    double degrees = blocks[0].getAngle();
-    double distance = blocks[0].getDistance();
-
-    std::cout<<"block: "<<degrees<<" degrees, "<<distance<<" meters, "<<"color: "<<blocks[0].getColor;
-      ()<<std::endl;
-    driveCtrl.turnForDegrees(degrees);                                                              
-    driveCtrl.straightForDistance(distance);                                                        
-    pickup.start();
-    usleep(20000000);
+    // Set up dropoff
+    firmware::Servo rightFloor = firmware::Servo(6);
+    firmware::Servo leftFloor = firmware::Servo(7);
+    firmware::Servo leftOpener = firmware::Servo(9);
+    firmware::Servo rightOpener = firmware::Servo(8);
+    control::Dropoff leftStack(leftFloor, leftOpener, 1);
+    control::Dropoff rightStack(rightFloor, rightOpener, -1);
+    rightStack.resetStack();
+    leftStack.resetStack();
+ 
+    driveCtrl.straightForDistance(0.25);
+/*    pickup.start();
+    driveCtrl.straightForDistance(0.3);
+    usleep(10000000);
     pickup.stop();
+ 
+    rightStack.dropStack();
     usleep(5000000);
+    rightStack.resetStack();
+    usleep(1000000);
+    leftStack.dropStack();
+    usleep(5000000);
+    leftStack.resetStack();
 
+
+  leftMotor.setSpeed(0.0);
+  rightMotor.setSpeed(0.0);
+*/
   }
-    */
-  std::cout<<"end"<<std::endl;
   
-}
+
 

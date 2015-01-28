@@ -45,6 +45,7 @@ namespace drive {
         }
         while(leftEncoder.getDistance() < std::abs(distance) ||
               (distance < .0001 && std::abs(heading - gyro.getAngle()) > 1.0 )) { 
+            std::cout << leftEncoder.getDistance();
             double diff = heading - gyro.getAngle();
             gettimeofday(&currentTime, NULL);
             double newCurrentMS = ((double)currentTime.tv_sec)*1000.0 +
