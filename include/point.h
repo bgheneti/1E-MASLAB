@@ -22,6 +22,10 @@ namespace utils {
             y = (y-minY)*6.096;
         }
         
+        bool equals(utils::Point otherPoint) {
+            return x==otherPoint.x && y==otherPoint.y;
+        }
+
         // Return the string representation of the point
         std::string toString() {
             std::ostringstream stringStream;
@@ -31,6 +35,12 @@ namespace utils {
 
         double slope(Point otherPoint) {
             return (double(otherPoint.y - y))/(double(otherPoint.x - x));
+        }
+
+        double distanceTo(Point otherPoint) {
+            double dY = double(otherPoint.y - y);
+            double dX = double(otherPoint.x - x); 
+            return sqrt(dY*dY + dX*dX);
         }
     };
 

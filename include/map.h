@@ -4,9 +4,12 @@
 #include "point.h"
 #include <vector>
 #include <iostream>
+#include <string>
+
 namespace map {
     enum Element {
              EMPTY, // In playing field but nothing special
+             PASSABLE,
              HOMEBASE, // In home base polygon
              OUT_OF_BOUNDS, // Not in playing field
              WALL, // The boundary of the playing field
@@ -19,12 +22,31 @@ namespace map {
         };
 
     enum Zone {FIELD, HOME};
+    
+    struct DrivingInstruction {
+        double heading;
+        double distance;
+        DrivingInstruction(double heading, double distance) : heading(heading), distance(distance) {}
+    };
 
     class Map {
         private:
             std::vector<std::vector<Element> > grid;
             std::vector<std::vector<utils::Point> > stacks;
             utils::Point botLocation;
+            std::vector<utils::Point> walls; // even start point and odd end point
+            std::vector<utils::Point> homebase; // vertices in the polygon
+            std::vector<utils::Point> passableElements;
+            utils::AxisAlignedBoundingBox fieldBB;
+
+            void parseMapFile(std::string filename);
+            void initializeGrid();
+            void fillHomeBase();
+            void fillObjects();
+            void updatePassable();
+            void markPassable();
+            bool isGround(Element elt);
+            bool isStackToPickUp(Element elt);
 
         public:
             Map(std::string filename);
@@ -37,6 +59,9 @@ namespace map {
             void setLocationRelative(double deltaX, double deltaY);
             void setLocationRelative(int deltaX, int deltaY);
             utils::Point whereToDropStack(Zone zone);
+            utils::Point getNearestStack();
+            std::vector<utils::Point> getPathTo(utils::Point goal);
+            std::vector<DrivingInstruction> getDrivingInstructions(std::vector<utils::Point>, double currentHeading);
             void print();
 
     };
