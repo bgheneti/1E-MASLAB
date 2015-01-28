@@ -6,15 +6,15 @@
 namespace firmware {
 	class LimitSwitch {
 		private:
-			bool state;
+			int state;
 			void poll();
-			bool running;
-			mraa::Gpio* gpio = new mraa::Gpio(9);
-		public:
-			LimitSwitch();
+			int running;
+			mraa::Gpio gpio;
+	        public:
+			LimitSwitch(int pin);
 			void startPoll();
 			void stopPoll();
-			bool getState();
+			int getState();
 	};
 }
 

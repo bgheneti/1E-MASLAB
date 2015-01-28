@@ -225,24 +225,24 @@ namespace vision{
     Mat testOut;
     //std::cout << "processing Frame" << std::endl;
     processFrame(testFrame, testOut);
-    Size outSize = Size(testOut.cols, testOut.rows);
-    std::cout << "outviding" << std::endl;
-    VideoWriter outVid("test.avi", CV_FOURCC('M','P','4','2'),10,outSize,true);
-    VideoWriter outVid1("test1.avi", CV_FOURCC('M','P','4','2'),10,outSize,true);
+    //Size outSize = Size(testOut.cols, testOut.rows);
+    //std::cout << "outviding" << std::endl;
+    //VideoWriter outVid("test.avi", CV_FOURCC('M','P','4','2'),10,outSize,true);
+    //VideoWriter outVid1("test1.avi", CV_FOURCC('M','P','4','2'),10,outSize,true);
     Mat out;
     Mat oldOut=testOut;
-    assert(outVid.isOpened());
+    //assert(outVid.isOpened());
     //std::cout << "windowing" << std::endl;
     //imshow( "Display window", testOut);
     std::cout << running << std::endl;
     while (running) {
       Mat frame;
       cap >> frame;
-      outVid << frame;
+      //outVid << frame;
       processFrame(frame, out);
       addMat(oldOut,out);
       findCubes(oldOut);
-      outVid1 << oldOut;
+      //outVid1 << oldOut;
       //imshow( "Display window", oldOut);
       oldOut=out;
     }
@@ -253,11 +253,11 @@ namespace vision{
     running=1;
     std::thread thr(&Cam::poll, this);
     std::swap(thr, runner);
+    runner.detach();
   }
 
   void Cam::stopPoll(){
     running=0;
-    runner.join();
   }
 
   std::vector<Block> Cam::getBlocks(){
