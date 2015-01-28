@@ -4,9 +4,9 @@
 #include <iostream>
 #define PI 3.14159
 namespace map{
-  AngleLocalizer::AngleLocalizer(firmware::Rangefinder &rf,
-    drive::DriveTrain &dt, Map m):
-    rf(rf), dt(dt){
+  AngleLocalizer::AngleLocalizer(firmware::Rangefinder &front,
+    firmware::Rangefinder &right, drive::DriveTrain &dt, Map m):
+    front(front), right(right), dt(dt){
       //initialize a blank copy of expected
       expected = std::vector<double>(720, 0);
       
@@ -54,13 +54,13 @@ namespace map{
     std::cout << "location set" << std::endl;
   }
   
-  int AngleLocalizer::getMax(std::vector<double> sta, std::vector<double> dyn){
+  int AngleLocalizer::getMax(std::vector<double> sta, std::vector<double> dyn, int lowerBound, int upperBound){
     std::cout << "getMax" << std::endl;
     std::vector<double> res(360, 0);
     double max = 0;
-    int argmax = 0;
+    int argmax = lowerBound;
     std::cout << "getMax starting loop" << std::endl;
-    for (int n = 0; n < 360; n++){
+    for (int n = lowerBound; n < upperBound; n++){
       for (int m = 0; m < 360; m++){
         res[n] += dyn[m]*sta[m+n];
       }
@@ -75,20 +75,28 @@ namespace map{
   }
   
   int AngleLocalizer::getAngle(int numReadings){
+    return getAngle(numReaedings, 0, 360);
+  }
+  
+  int AngleLocalizer::getAngle(int numReadings, int lowerBound, int upperBound){
     std::cout << "getAngle" << std::endl;
     std::vector<double> readings(360, 0);
-    double stepTh = 360.0 / numReadings;
-    double currTh = 0;
+    double stepTh = (double)(upperBound - lowerBound) / numReadings;
+    double currTh = lowerBound;
     std::cout << "stepping " << stepTh << std::endl;
     
-    while(currTh < 360){
-      for (int i = 0; i < 10; i++){rf.getHighestProbDistance();}
-      readings[(int)currTh] = rf.getHighestProbDistance();
+    while(currTh < upperBound){
+      for (int i = 0; i < 10; i++){
+        front.getHighestProbDistance();
+        right.getHighestProbDistance();
+      }
+      readings[(int)currTh] = front.getHighestProbDistance();
+      readings[((int)currTh+90)%360] = right.getHighestProbDistance();
       dt.turnForDegrees(stepTh);
       currTh += stepTh;
       std::cout << "reached " << currTh << std::endl;;
     }
     std::cout << "done turning" << std::endl;
-    return getMax(expected, readings);
+    return getMax(expected, readings, lowerBound, upperBound);
   }
 }

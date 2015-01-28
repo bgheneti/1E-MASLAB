@@ -53,11 +53,11 @@ int main() {
     gyro.startPoll();
     drive::DriveTrain dt(motorL, motorR, encoderL, encoderR, gyro);
     
-    firmware::Rangefinder rf(1, 8, 17);
+    firmware::Rangefinder front(0, 6, 16);
+    firmware::Rangefinder right(1, 8, 17);
+    map::Map m("../test_map.txt");
     
-    map::Map m("");
-    
-    map::AngleLocalizer al(rf, dt, m);
+    map::AngleLocalizer al(front, right, dt, m);
     
     
     //usleep(500000);

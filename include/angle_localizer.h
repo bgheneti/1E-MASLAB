@@ -13,26 +13,28 @@ namespace map{
   
   class AngleLocalizer{
     private:
-      firmware::Rangefinder &rf;
+      firmware::Rangefinder &front;
+      firmware::Rangefinder &right;
       drive::DriveTrain &dt;
       int xLoc;
       int yLoc;
       std::vector<double> expected;
       std::vector<std::vector<double>> map;
     public:
-      AngleLocalizer(firmware::Rangefinder &rf,
+      AngleLocalizer(firmware::Rangefinder &front,
+        firmware::Rangefinder &right,
         drive::DriveTrain &dt,
         Map m);
       //must be called so that the localizer can calculate expected distances
       void setLocation(int xl, int yl);
       
       //returns the shift of indices that most likely yields static from dynamic
-      int getMax(std::vector<double> sta, std::vector<double> dyn);
+      int getMax(std::vector<double> sta, std::vector<double> dyn)nt lowerBound, int upperBound;
       
       //get most probable heading
       //degrees
       int getAngle(int numReadings);
-      
+      int getAngle(int numReadings, int lowerBound, int upperBound);
   };
 }
 
