@@ -59,7 +59,12 @@ int main() {
     map::Map m("test_map.txt");
     
     map::AngleLocalizer al(front, right, dt, m);
-    std::cout << "daasf" << std::endl;
+    
+    utils::Point currLoc = m.getLocation();
+    al.setLocation(currLoc.x, currLoc.y);
+    
+    std::cout << al.getAngle(10) << std::endl;
+    
     
     //usleep(500000);
     //std::cout << "running" << std::endl;
