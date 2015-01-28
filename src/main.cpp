@@ -34,45 +34,47 @@ void sig_handler(int signo) {
 
 int main() {
     signal(SIGINT, sig_handler);
-    
+    /*
     firmware::Gyro gyro(10);
 	gyro.startPoll();
-	/*
-	vision::Cam cam;
-	cam.startPoll();
-	usleep(1000000);
+	
+	//vision::Cam cam;
+	//cam.startPoll();
+	//usleep(1000000);
 	for(int i=0; i<10; i++) {
 		std::cout << "gyro angle " << gyro.getAngle() << std::endl; 
 		usleep(1000000);
 	}
-	*/
-    /*
+	
+    */
     firmware::Motor leftMotor(2,3);
     firmware::Motor rightMotor(0,1);
-    usleep(60000000);
+    leftMotor.setSpeed(0.5);
+    rightMotor.setSpeed(0.5);
+    usleep(6000000);
     leftMotor.setSpeed(0);
     rightMotor.setSpeed(0);
-    
+    /*
     firmware::Encoder leftEncoder(2,3);
-    firmware::Encoder rightEncoder(4,5);
+    firmware::Encoder rightEncoder(5,4);
     drive::DriveTrain driveCtrl(leftMotor,rightMotor,leftEncoder,rightEncoder,gyro);
     driveCtrl.straightForDistance(1.0);
    
-    bool found=false;
-    int time=10 * timeout * MS;
-    std::vector<vision::Block> blocks;
+    //bool found=false;
+    //int time=10 * timeout * MS;
+    //std::vector<vision::Block> blocks;
     */
-  
+    /*
   firmware::Motor pickupMotor = firmware::Motor(4,5);
   firmware::Servo sorter = firmware::Servo(10);
   firmware::LimitSwitch limitSwitch = firmware::LimitSwitch(0);
   firmware::ColorSensor colorSensor = firmware::ColorSensor(1);
   control::Pickup pickup = control::Pickup(pickupMotor,sorter,limitSwitch, colorSensor);
   pickup.start();
-  usleep(40000000);
+  usleep(60000000);
   pickup.stop();
   pickupMotor.setSpeed(0);
- /*
+  
   firmware::Servo rightFloor = firmware::Servo(6);
   firmware::Servo leftFloor = firmware::Servo(7);
   firmware::Servo leftOpener = firmware::Servo(9);

@@ -16,14 +16,20 @@ namespace firmware {
     // Sets the speed of the motor. Speed can be a number between -1.0 and 1.0.
     // Negative speeds are backwards and positive speeds are forwards.
     void Motor::setSpeed(double newSpeed) {
-        assert(-1.0 <= newSpeed && newSpeed <= 1.0);
-        if (newSpeed > 0) {
+	double setSpeed = newSpeed;
+	if (setSpeed > 0.5) {
+		setSpeed = 0.5;
+	} else if (setSpeed < -.5) {
+		setSpeed = -.5;
+	}
+        assert(-0.5 <= setSpeed && setSpeed <= 0.5);
+        if (setSpeed > 0) {
             dir.write(1.0);
         } else {
             dir.write(0.0);
         }
-        pwm.write(fabs(newSpeed));
-        speed = newSpeed;
+        pwm.write(fabs(setSpeed));
+        speed = setSpeed;
     }
 
     // Abruptly stops the motor (sets its speed to 0)

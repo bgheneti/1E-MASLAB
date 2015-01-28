@@ -12,7 +12,7 @@ namespace firmware {
       else{
 	color=utils::Color::GREEN;
       }
-      usleep(5000);
+      usleep(700000);
     }
   }
   

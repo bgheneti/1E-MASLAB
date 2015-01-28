@@ -23,7 +23,7 @@ namespace control {
 	      colorSensor.startPoll();
 	      numBlocks+=1;
 	      pickupMotor.setSpeed(0);
-	      usleep(400000);
+	      usleep(800000);
 	      std::cout<<"color:"<<colorSensor.getColor()<<std::endl;
 	      while(colorSensor.getColor()==utils::Color::NONE){
 		usleep(10000);
