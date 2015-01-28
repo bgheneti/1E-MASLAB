@@ -22,6 +22,12 @@ namespace map {
         };
 
     enum Zone {FIELD, HOME};
+    
+    struct DrivingInstruction {
+        double heading;
+        double distance;
+        DrivingInstruction(double heading, double distance) : heading(heading), distance(distance) {}
+    };
 
     class Map {
         private:
@@ -53,7 +59,9 @@ namespace map {
             void setLocationRelative(double deltaX, double deltaY);
             void setLocationRelative(int deltaX, int deltaY);
             utils::Point whereToDropStack(Zone zone);
+            utils::Point getNearestStack();
             std::vector<utils::Point> getPathTo(utils::Point goal);
+            std::vector<DrivingInstruction> getDrivingInstructions(std::vector<utils::Point>, double currentHeading);
             void print();
 
     };

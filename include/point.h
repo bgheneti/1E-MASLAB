@@ -36,6 +36,12 @@ namespace utils {
         double slope(Point otherPoint) {
             return (double(otherPoint.y - y))/(double(otherPoint.x - x));
         }
+
+        double distanceTo(Point otherPoint) {
+            double dY = double(otherPoint.y - y);
+            double dX = double(otherPoint.x - x); 
+            return sqrt(dY*dY + dX*dX);
+        }
     };
 
     struct AxisAlignedBoundingBox {

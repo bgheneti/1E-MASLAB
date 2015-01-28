@@ -324,6 +324,25 @@ namespace map {
         botLocation.y += deltaY;
     }
 
+    utils::Point Map::getNearestStack() {
+        double minDistance = 500;
+        utils::Point minStack;
+        for(int i=0; i<stacks.size(); i++) {
+            for(int j=0; j<stacks[i].size(); j++) {
+                double distance =0;
+                std::vector<DrivingInstruction> instructions = getDrivingInstructions(getPathTo(stacks[i][j]), 0);
+                for(int k=0; k<instructions.size(); k++) {
+                    distance += instructions[k].distance;
+                }
+                if(distance < minDistance) {
+                    minStack = stacks[i][j];
+                    minDistance = distance;
+                }
+            }
+        }
+        return minStack;
+    }
+
     utils::Point Map::whereToDropStack(Zone zone) {
 
 
@@ -378,10 +397,40 @@ namespace map {
             node = prev[node.x*MAXY + node.y];
         }
 
+        // Compress the path
+        std::vector<utils::Point> compressed_path;
+        compressed_path.push_back(botLocation);
+        for(int i=path.size()-3; i>=0; i--) {
+            int dX1 = path[i+1].x - path[i].x;
+            int dX2 = path[i+2].x - path[i+1].x;
+            int dY1 = path[i+1].y - path[i].y;
+            int dY2 = path[i+2].y - path[i+1].y;
+            if(dX1!=dX2 || dY1!=dY2) {
+                compressed_path.push_back(path[i+1]);
+            }
+        }
+        compressed_path.push_back(goal);
+
 
         delete[] dist;
         delete[] prev;
-        return path;    
+        return compressed_path;    
+    }
+
+    std::vector<DrivingInstruction> Map::getDrivingInstructions(std::vector<utils::Point> path, double currentHeading) {
+        std::vector<DrivingInstruction> drivingInstructions;
+        double heading = currentHeading;
+        for(int i=1; i<path.size(); i++) {
+            double distance = path[i-1].distanceTo(path[i]) * .1;
+            double dX = double(path[i].x - path[i-1].x);
+            double dY = double(path[i].y - path[i-1].y);
+            double newHeading = -atan2(dY, dX) * 180.0/3.14159 + 90 - heading;
+            drivingInstructions.push_back(DrivingInstruction(newHeading, distance));
+            heading = newHeading;
+        }
+
+        return drivingInstructions;
+
     }
 
     void Map::print() {
@@ -431,4 +480,5 @@ namespace map {
     }
 
 }
+
 
