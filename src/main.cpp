@@ -38,26 +38,70 @@ int main() {
     // Initialize motors
     firmware::Motor leftMotor(0, 1);
     firmware::Motor rightMotor(2, 3);
-   
+    
     // Set up gyro 
     rightMotor.setSpeed(0.0);
     leftMotor.setSpeed(0.0);
     usleep(500000);
     firmware::Gyro gyro(10);
+    vision::Cam cam;
     gyro.startPoll();
-    usleep(500000);
-   
+    cam.startPoll();
+    usleep(1000000);
+    
     // Set up encoders
     firmware::Encoder leftEncoder(3, 2);
     firmware::Encoder rightEncoder(4,5);
     drive::DriveTrain driveCtrl(leftMotor, rightMotor, leftEncoder, rightEncoder, gyro);
     // Set up pickup 
-    driveCtrl.straightForDistance(.5);
     firmware::Motor pickupMotor = firmware::Motor(4,5);
     firmware::Servo sorter = firmware::Servo(10);
     firmware::LimitSwitch limitSwitch = firmware::LimitSwitch(0);
     firmware::ColorSensor colorSensor = firmware::ColorSensor(1);
     control::Pickup pickup = control::Pickup(pickupMotor,sorter,limitSwitch, colorSensor);
+    
+    bool found=false;
+    int time=10000000;
+    //look for blocks
+    std::vector<vision::Block> blocks;
+    
+    while(time>0){
+      std::cout<< "block"<<std::endl;
+
+      blocks = cam.getBlocks();
+      if(blocks.size()>0){
+	found=true;
+	std::cout<<"found block"<<std::endl;
+        break;
+      }
+      usleep(100000);
+      time-= 100000;
+
+    }
+
+    //if a block is found drive towards it and pick it up
+    if(found==true){
+      double degrees = blocks[0].getAngle();
+      double distance = blocks[0].getDistance();
+
+      std::cout<<"block: "<<degrees<<" degrees, "<<distance<<" meters, "<<"color: "<<blocks[0].getColor()<<std::endl;
+      driveCtrl.turnForDegrees(degrees);
+      if(distance>.3){
+	driveCtrl.straightForDistance(distance-.2);
+      }
+      distance=.3;
+      pickup.start();
+      driveCtrl.straightForDistance(distance);
+      usleep(10000000);
+      pickup.stop();
+     }
+
+    pickup.start();
+    usleep(30000000);
+    pickup.stop();
+    std::cout<<"done with pickup"<<std::endl;
+    usleep(5000000);
+    pickupMotor.setSpeed(0);
 /*
     // Set up dropoff
     firmware::Servo rightFloor = firmware::Servo(7);
@@ -88,8 +132,8 @@ int main() {
     leftStack.resetStack();
 */
 
-
-  gyro.stopPoll(); 
+    //cam.stopPoll();
+    //gyro.stopPoll(); 
   return 0;
 }
   

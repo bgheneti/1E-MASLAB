@@ -2,7 +2,9 @@
 #include "../include/color.h"
 #include <iostream>
 #define SORT_CENTER 5.0
-#define SORT_DELTA 72.0
+#define SORT_FAST_DELTA 20.0
+#define SORT_OVERSHOOT_DELTA 76.0
+#define SORT_FINAL_DELTA 65.0
 namespace control {
 	Pickup::Pickup(firmware::Motor& pickupMotor,
 		       firmware::Servo& sorter, firmware::LimitSwitch& limitSwitch, firmware::ColorSensor& colorSensor) : pickupMotor(pickupMotor), sorter(sorter), limitSwitch(limitSwitch), colorSensor(colorSensor), numRedBlocks(0), numGreenBlocks(0){}
@@ -18,7 +20,7 @@ namespace control {
 	  limitSwitch.startPoll();
 	  sorter.setServoPosition(SORT_CENTER);
 	  running=1;
-	  pickupMotor.setSpeed(-0.4);
+	  pickupMotor.setSpeed(-0.5);
 	  while(running){
 	    if(limitSwitch.getState()==0){
 	      colorSensor.startPoll();
@@ -30,23 +32,37 @@ namespace control {
 		usleep(10000);
 	      }
 	      if(colorSensor.getColor()==utils::Color::RED){
-		for(int delta=0;delta<SORT_DELTA+1;delta++){
+		sorter.setServoPosition(SORT_CENTER+SORT_FAST_DELTA);
+		for(int delta=SORT_FAST_DELTA;delta<SORT_OVERSHOOT_DELTA+1;delta++){
 		  sorter.setServoPosition(SORT_CENTER + delta);
 		  usleep(10000);
 		}
-		numRedBlocks+=1;
+		for(int i=0;i<4;i++){
+                  sorter.setServoPosition(SORT_CENTER+SORT_OVERSHOOT_DELTA);
+		  usleep(100000);
+		  sorter.setServoPosition(SORT_CENTER+SORT_FINAL_DELTA);
+		  usleep(100000);
+		}
+		numRedBlocks++;
 	      }
 	      else if(colorSensor.getColor()==utils::Color::GREEN){
-		for(int delta=0;delta<SORT_DELTA+1;delta++){
+		sorter.setServoPosition(SORT_CENTER-SORT_FAST_DELTA);
+		for(int delta=SORT_FAST_DELTA;delta<SORT_OVERSHOOT_DELTA+1;delta++){
                   sorter.setServoPosition(SORT_CENTER - delta);
                   usleep(10000);
                 }
-		numGreenBlocks+=1;
+		for(int i=0;i<4;i++){
+                  sorter.setServoPosition(SORT_CENTER-SORT_OVERSHOOT_DELTA);
+                  usleep(100000);
+                  sorter.setServoPosition(SORT_CENTER-SORT_FINAL_DELTA);
+                  usleep(100000);
+		}
+		numGreenBlocks++;
 	      }
-	      usleep(3000000);
+	      usleep(500000);
 	      sorter.setServoPosition(SORT_CENTER);
 	      usleep(500000);
-	      pickupMotor.setSpeed(-0.4);
+	      pickupMotor.setSpeed(-0.5);
 	      colorSensor.stopPoll();
 	    }
 	    usleep(10000);
