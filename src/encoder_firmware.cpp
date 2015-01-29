@@ -1,86 +1,118 @@
-// Contains the firmware Encoder class to interface with the motor encoders.
-           
-
-#include <cassert>
-#include <cmath>
-#include <thread>
-#include <iostream>
-
 #include "../include/encoder_firmware.h"
+#include <iostream>
+namespace firmware {
+struct encoderISRArgs {
+  Encoder *obj;
+  mraa::Gpio *pin;
+};
 
- 
-namespace firmware
-{
-    // This is the class to interact with the motor encoders
-    // Sample usage:
-    //      firmware::Encoder encoder = firmware::Encoder(inputPin1, inputPin2);
-    //      encoder.startPolling();
-    //      int intermediateNumTicks = encoder.getNumTicks(); 
-    //      encoder.stopPolling(); 
-    //      int numTicks = encoder.getNumTicks(); 
-    //      encoder.reset(); // Reset the tick count to 0
-    //
-
-  Encoder::Encoder(mraa::Gpio& input1, mraa::Gpio& input2) : gpio1(input1), gpio2(input2) {
-        state = gpio1.read()<<1 + gpio2.read();
-        counter = 0;
-        running = false;
-    }
-
-    // Read the value on the pins repeatedly and stores the state.
-    void Encoder::poll() {
-        while(running) {
-	  //int newState = ((((unsigned int)gpio1.read())<<1) + ((unsigned int)gpio2.read())) & 3;
-	  int newState = 0;
-	  bool state1 = gpio1.read();
-	  bool state2 = gpio2.read();
-	  if(!state1 && !state2))  {
-	    newState = 0;
-	  }
-	  else if(state1 && (!state2))  {
-	    newState = 1;
-	  }
-	  else if(state1 && state2)  {
-	    newState = 2;
-	  }
-	  else  {
-	    newState = 3;
-	  }
-            assert(newState<4 && newState>=0);
-	    	    counter += newState - state;
-            state = newState;
-        }
-    }
-
-    // Spawn a new thread to continuously poll the encoder
-    void Encoder::startPolling() {
-        running = true;
-        std::thread thr(&Encoder::poll, this);
-        std::swap(thr, runner);
-    }
-
-    // Get the poll thread to return and stop
-    void Encoder::stopPolling() {
-        running = false;
-	runner.join();
-    }
-
-    // Get the number of ticks registered since the last time the counter was reset.
-    //
-    // Returns the max of the stateTicks array because it is possible we skipped a state
-    // by mistake somewhere.
-    double Encoder::getDistance() {
-                // 480 is ticks per rotation
-        // 0.0492125 is radius of wheel in meters
-	// 7.0104 is the constant scaling factor from tuning
-        return ((double) counter) / 480.0 * 0.0492125 * 7.0104 / 4;
-	//return 1;
+uint8_t getPhase(uint8_t a, uint8_t b) {
+//  assert(a < 2); // Can only be 0 or 1
+//  assert(b < 2); // Can only be 0 or 1
+  uint8_t ret = 0;
+  
+  switch (a << 1 | b) {
+    case 0:
+      ret = 0;
+      break;
+    case 1:
+      ret = 1;
+      break;
+    case 2:
+      ret = 3;
+      break;
+    case 3:
+      ret = 2;
+      break;
+  }
+  return ret;
 }
- 
-    // Reset the number of ticks to 0.
-    void Encoder::resetNumTicks() {
-          counter = 0;
-    }
- 
-}  
 
+void Encoder::resetCount() {
+	count = 0;
+}
+
+void edgeISRWrapper(void *args) {
+  struct encoderISRArgs *isrArgs = (encoderISRArgs *)args;
+  Encoder *obj = isrArgs->obj;
+  mraa::Gpio *pin = isrArgs->pin;
+  obj->edgeISR(pin);
+}
+
+void Encoder::edgeISR(mraa::Gpio *pin) {
+//  assert(pin == phaseAp || pin == phaseBp);
+  char pinChar = pin == phaseAp ? 'A' : 'B';
+  
+//  printf("In ISR for pin %c\r\n", pinChar);
+
+  uint8_t a = aState;
+  uint8_t b = bState;
+
+  uint8_t newState = pin->read();
+
+  uint8_t prevPhase = getPhase(a,b);
+//  printf("Previous Phase: %x\r\n ", prevPhase);
+
+  uint8_t newPhase = 0xFF;
+  if (pin == phaseAp) {
+    aState = newState;
+    newPhase = getPhase(newState, b); 
+  } else if (pin == phaseBp){
+    bState = newState;
+    newPhase = getPhase(a, newState);
+  }
+  
+//  printf("New Phase: %x\r\n ", newPhase);
+
+  updateTick(prevPhase, newPhase);
+}
+
+
+void Encoder::updateTick(uint8_t oldPhase, uint8_t newPhase) {
+  int8_t delta = newPhase - oldPhase; 
+  //printf("Old: %x New: %x Delta: %d Count: %d\r\n", oldPhase, newPhase, delta, count);
+  if ((delta == 1) || (delta == -3)) {
+    count++;
+  } else if ((delta  == -1) || (delta == 3)) {
+    count--;
+  } else {
+    printf("Invalid Transition from %x to %x\r\n", oldPhase, newPhase);
+  }
+}
+
+
+Encoder::Encoder(uint8_t phaseApin, uint8_t phaseBpin) {
+  phaseAp = new mraa::Gpio(phaseApin);
+  phaseBp = new mraa::Gpio(phaseBpin);
+ 
+  aState = 0;
+  bState = 0;
+
+  isrArgsA = new encoderISRArgs;
+  isrArgsA->obj = this;
+  isrArgsA->pin = phaseAp;
+
+  isrArgsB = new encoderISRArgs;
+  isrArgsB->obj = this;
+  isrArgsB->pin = phaseBp;
+
+  phaseAp->dir(mraa::DIR_IN);
+  phaseBp->dir(mraa::DIR_IN);
+
+  phaseAp->isr(mraa::EDGE_BOTH, edgeISRWrapper, isrArgsA);
+  phaseBp->isr(mraa::EDGE_BOTH, edgeISRWrapper, isrArgsB);
+ 
+  count = 0;
+}
+
+Encoder::~Encoder() {
+  delete phaseAp;
+  delete phaseBp;
+  delete isrArgsA;
+  delete isrArgsB;
+}
+
+double Encoder::getCount() const {
+  return double(count)*1.3625/8000.0;
+}
+}

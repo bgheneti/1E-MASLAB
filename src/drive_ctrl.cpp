@@ -6,9 +6,9 @@
 #include <chrono>
 #include <iostream>
 #define SPEED 0.25
-#define P .05
-#define I 0.00000
-#define D -2.5
+#define P .037
+#define I 0.0000024
+#define D -2.3
 namespace drive {
 
     DriveTrain::DriveTrain(firmware::Motor &leftMotor, 
@@ -25,9 +25,9 @@ namespace drive {
                                                    driving(false) {}
 
     void DriveTrain::resetSensors() {
-        leftEncoder.resetNumTicks();
-        rightEncoder.resetNumTicks();
-        //gyro.zeroAngle();
+        leftEncoder.resetCount();
+        rightEncoder.resetCount();
+        gyro.zeroAngle();
 	std::cout << "angle zeroed" << std::endl;
     
     }
@@ -49,10 +49,10 @@ namespace drive {
         } else {
             bias = 0;
         }
-
 	int correctAngleCount = 0;
-        while(std::abs(leftEncoder.getDistance()) < std::abs(distance) ||
-              (distance < .0001 && correctAngleCount < 5 )) { 
+        while(std::abs(leftEncoder.getCount()) < std::abs(distance) ||
+              (distance < .0001 && correctAngleCount < 5 )) {
+	    std::cout<<"distance="<<distance<<std::endl;
 	    std::cout << (distance < .0001) << "no distance" << std::endl;
 	    if(std::abs(heading - gyro.getAngle()) < 1.0) {
 		correctAngleCount++;

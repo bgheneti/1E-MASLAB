@@ -48,25 +48,17 @@ int main() {
     usleep(500000);
    
     // Set up encoders
-    mraa::Gpio leftEncoderPin1(3);
-    mraa::Gpio leftEncoderPin2(2); 
-    firmware::Encoder leftEncoder(leftEncoderPin1, leftEncoderPin2);
-    //firmware::Encoder rightEncoder(4,5);
-    leftEncoder.startPolling();
-    //rightEncoder.startPolling();
-    while(running) {
-      std::cout << gyro.getAngle() << ' ';
-      std::cout << leftEncoder.getDistance()<<std::endl;
-      usleep(300000);
-    }
-    /*
+    firmware::Encoder leftEncoder(3, 2);
+    firmware::Encoder rightEncoder(4,5);
+    drive::DriveTrain driveCtrl(leftMotor, rightMotor, leftEncoder, rightEncoder, gyro);
     // Set up pickup 
+    driveCtrl.straightForDistance(.5);
     firmware::Motor pickupMotor = firmware::Motor(4,5);
     firmware::Servo sorter = firmware::Servo(10);
     firmware::LimitSwitch limitSwitch = firmware::LimitSwitch(0);
     firmware::ColorSensor colorSensor = firmware::ColorSensor(1);
     control::Pickup pickup = control::Pickup(pickupMotor,sorter,limitSwitch, colorSensor);
-
+/*
     // Set up dropoff
     firmware::Servo rightFloor = firmware::Servo(7);
     firmware::Servo leftFloor = firmware::Servo(6);
@@ -79,13 +71,14 @@ int main() {
     rightStack.resetStack();
     leftStack.resetStack();
     */
-//    driveCtrl.turnForDegrees(60.0);
 
-/*    pickup.start();
-    driveCtrl.straightForDistance(0.3);
-    usleep(10000000);
-    pickup.stop();
-*/ 
+    //pickup.start();
+//    driveCtrl.straightForDistance(1.0);
+
+    //usleep(30000000);
+//    pickup.stop();
+    //usleep(1000000);
+ 
  /*   rightStack.dropStack();
     usleep(5000000);
     rightStack.resetStack();
@@ -96,8 +89,6 @@ int main() {
 */
 
 
-    leftEncoder.stopPolling();
-    //rightEncoder.stopPolling(); 
   gyro.stopPoll(); 
   return 0;
 }

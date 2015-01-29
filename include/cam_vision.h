@@ -24,8 +24,8 @@ namespace vision{
 	    void addMat(Mat& a, Mat& b);
 	    void findCubes(Mat& inFrame);
 	    void processFrame(Mat& inFrame, Mat& outFrame);
-	    std::vector<int> expandPoint(int x, int y, Mat& inFrame);
-	    std::vector<int> findPoint(Mat& inFrame);
+	    std::vector<int> expandPoint(int x, int y, Mat& inFrame, bool green);
+	    std::vector<std::vector<int> > findPoints(Mat& inFrame);
 	    std::vector<Block> blocks;
         public:	  
 	    void startPoll();

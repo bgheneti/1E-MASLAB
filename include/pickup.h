@@ -16,6 +16,7 @@ namespace control {
 			firmware::Servo& sorter;
 			firmware::LimitSwitch& limitSwitch;
 			firmware::ColorSensor& colorSensor;
+			std::thread runner;
 			int numRedBlocks;
 			int numGreenBlocks;
 			int numBlocks;

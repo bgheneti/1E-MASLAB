@@ -33,6 +33,11 @@ namespace vision{
 	  *(p+2) = 0;
 	  floodFill(inFrame,Point(col,row),Scalar(0, 255, 0));
 	}
+	else if((b > ( r * 3))){
+	  *p = 255;
+	  *(p+1) = 0;
+	  *(p+2) = 0;
+	}
 	else{
 	  *p = 0;
 	  *(p+1) = 0;
@@ -48,7 +53,17 @@ namespace vision{
   }
 
 
-  std::vector<int> vision::Cam::expandPoint(int x, int y, Mat& inFrame){
+  std::vector<int> vision::Cam::expandPoint(int x, int y, Mat& inFrame, bool green){
+    Vec3b color;
+    Vec3b replacementColor;
+    if(green==0){
+      color =  Vec3b(0,0,255);
+      replacementColor = Vec3b(0,0,127);
+    }
+    else if(green==1){
+      color =  Vec3b(0,255,0);      
+      replacementColor =  Vec3b(0,127,0);            
+    }
     std::vector<int> vals(3,0);
     vals[0]= 0;
     vals[1]=-1;
@@ -71,8 +86,8 @@ namespace vision{
       }
       for(int i=std::max(x-1,0);i<std::min(x+2,inFrame.cols);i++){
 	for(int j=std::max(y-1,0);j<std::min(y+2,inFrame.rows);j++){
-	  if((i!=x) && (j!=y) && (inFrame.at<Vec3b>(j,i)[0]==255)){
-	    inFrame.at<Vec3b>(j,i)[0]=100;
+	  if((i!=x) && (j!=y) && (inFrame.at<Vec3b>(j,i)==color)){
+	    inFrame.at<Vec3b>(j,i)=replacementColor;
 	    std::vector<int> newPoint;
 	    newPoint.push_back(i);
 	    newPoint.push_back(j);
@@ -85,56 +100,77 @@ namespace vision{
     return vals;
   }
   //recursively expands a points to determine the size of and lowest point on the coloration in inFrame
-  vector<int> vision::Cam::findPoint(Mat& inFrame){
+
+  std::vector<vector<int> > vision::Cam::findPoints(Mat& inFrame){
     //std::cout<<"find"<<std::endl;
-    std::vector<int> point(2,-1);
+
+    std::vector<int> redPoint(2,-1);
+    std::vector<int> greenPoint(2,-1);
     int width=inFrame.cols;
+    int wallHeightThreshhold=4;
     int height=inFrame.rows;
-    for(int i=0; i<width;i++){
-      for(int j=0;j<height;j++){
-	if(inFrame.at<Vec3b>(j,i)[0]==255){
+    bool foundAll=false;
+    for(int i=width-1; i>-1;i--){
+      for(int j=height-1;j>-1;j--){
+	if((j<redPoint[1])&&(j<greenPoint[1])){
+	  foundAll=true;
+	  break;
+	}
+        else if(inFrame.at<Vec3b>(j,i)[1]==255){
 	  //std::cout<<"found"<<std::endl;
-	  inFrame.at<Vec3b>(j,i)=Vec3b(0,255,0);
-	  std::vector<int>val=expandPoint(i,j,inFrame);
+	  inFrame.at<Vec3b>(j,i)=Vec3b(0,127,0);
+	  std::vector<int>val=expandPoint(i,j,inFrame,1);
 	  //std::cout<<"setting found"<<std::endl;
-	  if((val[0]>8) && (val[2]>point[1])){
-	    point[0]=val[1];
-	    point[1]=val[2];
+	  if((val[0]>10) && (val[2]>greenPoint[1])){
+	    greenPoint[0]=val[1];
+	    greenPoint[1]=val[2];
+	  }
+	}
+	else if(inFrame.at<Vec3b>(j,i)[2]==255){
+	  //std::cout<<"found"<<std::endl;
+	  inFrame.at<Vec3b>(j,i)=Vec3b(0,0,127);
+	  std::vector<int>val=expandPoint(i,j,inFrame,0);
+	  //std::cout<<"setting found"<<std::endl;
+	  if((val[0]>10) && (val[2]>redPoint[1])){
+	    redPoint[0]=val[1];
+	    redPoint[1]=val[2];
+	  }
+	}
+	else if(inFrame.at<Vec3b>(j,i)[0]==255){
+	  bool isWall=true;
+	  for(int y=j;y>std::max(j-wallHeightThreshhold,-1);y--){
+	    if(inFrame.at<Vec3b>(y,i)[0]==255){
+	      inFrame.at<Vec3b>(y,i)=Vec3b(240,240,0);    
+	    }
+	    else{
+	      isWall=false;
+	      break;
+	    }
+	  }
+	  std::cout<<isWall<<std::endl;
+	  if(isWall){
+	    for(int y=j-5;y>-1;y--){
+	      inFrame.at<Vec3b>(y,i)=Vec3b(0,0,0);
+	    }
 	  }
 	}
       }
+      if(foundAll){
+	break;
+      }
     }
-    //std::cout<<point[0]<<":"<<point[1]<<std::endl;
-    return point;
+    std::cout<<"green:"<<greenPoint[0]<<","<<greenPoint[1]<<std::endl;
+    std::vector<vector<int> > points;
+    points.push_back(redPoint);
+    points.push_back(greenPoint);
+    return points;
   }
 
 
   //sets entries in vector blocks to the closest red block and the closest green block
   void Cam::findCubes(Mat& inFrame){
-    std::cout<<"find cubes"<<std::endl;
-    Mat_<Vec3b> greenFrame(240, 320, Vec3b(0,0,0));
-    Mat_<Vec3b> redFrame(240, 320, Vec3b(0,0,0));
-    //inFrame=redFrame;
-    for(int row = 0; row < inFrame.rows; ++row) {
-      uchar* inFramePos = inFrame.ptr(row);
-      uchar* redFramePos = redFrame.ptr(row);  
-      uchar* greenFramePos = greenFrame.ptr(row);    
-      for(int col = 0; col < inFrame.cols; col++) {
-	if(*(inFramePos+1)==255){
-	  *(greenFramePos)=255;
-	  *(greenFramePos+1)=255;
-	  *(greenFramePos+2)=255;
-	}
-	else if(*(inFramePos+2)==255){
-	  *(redFramePos)=255;
-	  *(redFramePos+1)=255;
-	  *(redFramePos+2)=255;
-	}
-	inFramePos+=3;
-	redFramePos+=3;
-	greenFramePos+=3;
-      }
-    }
+    //std::cout<<"find cubes"<<std::endl;
+
     //std::cout << inFrame.depth() << ", " << inFrame.channels() << std::endl;
     
     blocks.clear();
@@ -142,23 +178,24 @@ namespace vision{
     double frameWidth=inFrame.cols;
     int i=0;
    
-    vector<int> point= findPoint(redFrame);
-    if(point[0]!=-1){
-      double X = point[0]; 
-      double Y = point[1];
+    vector<vector<int> > points = findPoints(inFrame);
+    Vector<int> redPoint=points[0];
+    vector<int> greenPoint=points[1];
+    if(redPoint[0]!=-1){
+      double X = redPoint[0]; 
+      double Y = redPoint[1];
       printf("red: x:%f, y:%f\n",X,Y);
       
-      for(int x=std::max(0.0,X-1);x<std::min(X+2,frameWidth);x++){
-	for(int y=std::max(0.0,Y-1);y<std::min(Y+2,frameWidth);y++){
-	  inFrame.at<Vec3b>(Point(x,y))=Vec3b(255,0,0);
+      for(int x=std::max(0.0,X-3);x<std::min(X+4,frameWidth);x++){
+	for(int y=std::max(0.0,Y-3);y<std::min(Y+4,frameHeight);y++){
+	  inFrame.at<Vec3b>(Point(x,y))=Vec3b(255,255,255);
 	}
       }
 
-      double angle= 60 * ( (frameWidth/2 - X) / frameWidth);
+      double angle= 60 * ( (X-frameWidth/2) / frameWidth);
       double forwardDistance = (height * tan( (4 * atan(1) / 180) * (90-hViewAngle/2-angleDown+hViewAngle * (frameHeight-Y)/frameHeight))+cameraDistance);
       double distance = forwardDistance/cos( (4 * atan(1) / 180) * angle);
       Color color(red);
-      std::cout<<"fD:"<<forwardDistance<<",D:"<<distance<<",a:"<<angle<<std::endl;
       vector<double> position;
       position.push_back(angle);
       position.push_back(distance);
@@ -166,20 +203,17 @@ namespace vision{
       blocks.push_back(block);
       std::cout<<"made block"<<std::endl;
     }
-
-    point= findPoint(redFrame);
-    if(point[0]!=-1){
-      double X = point[0]; 
-      double Y = point[1];
+    if(greenPoint[0]!=-1){
+      double X = greenPoint[0]; 
+      double Y = greenPoint[1];
       printf("green: %d, x:%f, y:%f\n",i,X,Y);
 
-      for(int x=std::max(0.0,X-1);x<std::min(X+2,frameWidth);x++){
-	for(int y=std::max(0.0,Y-1);y<std::min(Y+2,frameWidth);y++){
-	  inFrame.at<Vec3b>(Point(x,y))=Vec3b(255,0,0);
+      for(int x=std::max(0.0,X-3);x<std::min(X+4,frameWidth);x++){
+	for(int y=std::max(0.0,Y-3);y<std::min(Y+4,frameHeight);y++){
+	  inFrame.at<Vec3b>(Point(x,y))=Vec3b(255,255,255);
 	}
       }
-
-      double angle= 60 * ( (frameWidth/2 - X) / frameWidth);
+      double angle= 60 * ( (X-frameWidth/2) / frameWidth);
       double forwardDistance=  (height * tan( (4 * atan(1) / 180) * (90-hViewAngle/2-angleDown+hViewAngle * (frameHeight-Y)/frameHeight))+cameraDistance);
       double distance= forwardDistance/ cos( (4 * atan(1) / 180) * angle);
       Color color(green);
@@ -225,26 +259,23 @@ namespace vision{
     Mat testOut;
     //std::cout << "processing Frame" << std::endl;
     processFrame(testFrame, testOut);
-    //Size outSize = Size(testOut.cols, testOut.rows);
+    Size outSize = Size(testOut.cols, testOut.rows);
     //std::cout << "outviding" << std::endl;
-    //VideoWriter outVid("test.avi", CV_FOURCC('M','P','4','2'),10,outSize,true);
+    VideoWriter outVid("testEd.avi", CV_FOURCC('M','P','4','2'),10,outSize,true);
     //VideoWriter outVid1("test1.avi", CV_FOURCC('M','P','4','2'),10,outSize,true);
     Mat out;
     Mat oldOut=testOut;
-    //assert(outVid.isOpened());
+    assert(outVid.isOpened());
     //std::cout << "windowing" << std::endl;
     //imshow( "Display window", testOut);
     std::cout << running << std::endl;
     while (running) {
       Mat frame;
       cap >> frame;
-      //outVid << frame;
       processFrame(frame, out);
-      addMat(oldOut,out);
-      findCubes(oldOut);
-      //outVid1 << oldOut;
+      findCubes(out);
       //imshow( "Display window", oldOut);
-      oldOut=out;
+      outVid << out;
     }
   }
 

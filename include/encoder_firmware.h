@@ -1,28 +1,32 @@
-#ifndef INCLUDE_ENCODER_FIRMWARE_H_
-#define INCLUDE_ENCODER_FIRMWARE_H_
+#ifndef ENCODER_H
+#define ENCODER_H
 
+
+#include <stdint.h>
+#include <pthread.h>
 #include "mraa.hpp"
-#include <thread>
-
 namespace firmware {
-    class Encoder {
-        private:
-            mraa::Gpio& gpio1; // the pins the encoder is attached to
-            mraa::Gpio& gpio2; // the pins the encoder is attached to
-            int state; // the state the encoder is currently in (0-3).
-            int counter;
-	    //int ticks[4];
-	    bool running;
-            std::thread runner;
-            void poll();
-        public:
-            Encoder(mraa::Gpio& input1, mraa::Gpio& input2);
-            double getDistance();
-            void resetNumTicks();
-            void startPolling();
-            void stopPolling();
-    };
+struct encoderISRArgs;
 
+class Encoder {
+    mraa::Gpio *phaseAp;
+    mraa::Gpio *phaseBp;
+    pthread_t threadHandle;
 
+    volatile int32_t count;
+    volatile uint8_t aState;
+    volatile uint8_t bState;
+    struct encoderISRArgs *isrArgsA;
+    struct encoderISRArgs *isrArgsB;
+
+    void updateTick(uint8_t oldPhase, uint8_t newPhase);
+  public:
+    Encoder(uint8_t phaseApin, uint8_t phaseBpin);
+    ~Encoder();
+    void resetCount();
+    double getCount() const;
+    void edgeISR(mraa::Gpio *pin);
+};
 }
-#endif // INCLUDE_ENCODER_FIRMWARE_
+
+#endif

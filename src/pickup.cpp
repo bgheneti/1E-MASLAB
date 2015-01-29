@@ -1,15 +1,16 @@
 #include "../include/pickup.h"
 #include "../include/color.h"
 #include <iostream>
-#define SORT_CENTER 6.0
-#define SORT_DELTA 70.0
+#define SORT_CENTER 5.0
+#define SORT_DELTA 72.0
 namespace control {
 	Pickup::Pickup(firmware::Motor& pickupMotor,
 		       firmware::Servo& sorter, firmware::LimitSwitch& limitSwitch, firmware::ColorSensor& colorSensor) : pickupMotor(pickupMotor), sorter(sorter), limitSwitch(limitSwitch), colorSensor(colorSensor), numRedBlocks(0), numGreenBlocks(0){}
 
         void Pickup::start(){
 	  std::thread thr(&Pickup::run, this);
-	  thr.detach();
+	  std::swap(thr, runner);
+
 	} 
 
         void Pickup::run(){
@@ -37,7 +38,7 @@ namespace control {
 	      }
 	      else if(colorSensor.getColor()==utils::Color::GREEN){
 		for(int delta=0;delta<SORT_DELTA+1;delta++){
-                  sorter.setServoPosition(SORT_CENTER + delta);
+                  sorter.setServoPosition(SORT_CENTER - delta);
                   usleep(10000);
                 }
 		numGreenBlocks+=1;
@@ -51,13 +52,14 @@ namespace control {
 	    usleep(10000);
 	  }
 	  usleep(50000);
-	  pickupMotor.setSpeed(0);
+	  pickupMotor.setSpeed(0.0);
 	  limitSwitch.stopPoll();
 	  colorSensor.stopPoll();
 	}
 
         void Pickup::stop() {
 	  running=0;
+	  runner.join();
         }
 
         int Pickup::numRedBlocksPickedUp(){
