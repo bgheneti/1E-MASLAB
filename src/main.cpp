@@ -58,8 +58,9 @@ int main() {
     
     firmware::Rangefinder front(0, 6, 16);
     firmware::Rangefinder right(1, 8, 17);
-    
+    std::cout << "asdf" << std::endl;
     map::Map m("current_map.txt");
+    std::cout << "fasd" << std::endl;
     //m.print();
     
     map::AngleLocalizer al(front, right, dt, m);

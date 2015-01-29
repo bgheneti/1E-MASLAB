@@ -41,18 +41,22 @@ namespace map{
         if (currX + 1 < probMap[0].size() && probMap[currY][currX+1]==2){
           xs.push(currX+1);
           ys.push(currY);
+          probMap[currY][currX+1] = 0;
         }
-        if (currX - 1 >= 0 && probMap[currY][currX+1] == 2){
+        if (currX - 1 >= 0 && probMap[currY][currX-1] == 2){
           xs.push(currX-1);
           ys.push(currY);
+          probMap[currY][currX-1] = 0;
         }
         if (currY + 1 < probMap.size() && probMap[currY+1][currX] == 2){
           xs.push(currX);
           ys.push(currY+1);
+          probMap[currY+1][currX] = 0;
         }
         if (currY - 1 >= 0 && probMap[currY-1][currX] == 2){
           xs.push(currX);
           ys.push(currY-1);
+          probMap[currY-1][currX] = 0;
         }
       }
       for (int r = 0; r < probMap.size(); r++){
@@ -66,6 +70,13 @@ namespace map{
   void AngleLocalizer::setLocation(int xl, int yl){
     xLoc = xl;
     yLoc = yl;
+    if (probMap[yLoc][xLoc] != 0){
+      if (probMap[yLoc+1][xLoc] == 0){yLoc += 1;}
+      else if (probMap[yLoc - 1][xLoc] == 0){yLoc -= 1;}
+      else if (probMap[yLoc][xLoc+1] == 0){xLoc += 1;}
+      else if (probMap[yLoc][xLoc-1] == 0){xLoc -= 1;}
+      else{std::cout << "issue with starting location" << std::endl;}
+    }
     double currX = xLoc;
     double currY = yLoc;
     double stepX, stepY;
@@ -84,7 +95,7 @@ namespace map{
       }
       
       //store expected distances
-      expected[th] = sqrt((currX-xLoc)*(currX-xLoc) + (currY-yLoc)*(currY-yLoc));
+      expected[th] = sqrt((currX-(double)xLoc)*(currX-(double)xLoc) + (currY-(double)yLoc)*(currY-(double)yLoc));
       expected[th+360] = expected[th];
       std::cout << th << ": " <<  expected[th] << std::endl;
       //reset
