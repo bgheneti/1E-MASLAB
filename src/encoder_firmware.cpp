@@ -23,7 +23,7 @@ namespace firmware
 
     Encoder::Encoder(int inputPin1, int inputPin2) : gpio1(inputPin1), gpio2(inputPin2) {
         state = gpio1.read()<<1 + gpio2.read();
-        
+        ticks = 0;
         running = false;
     }
 
@@ -34,12 +34,16 @@ namespace firmware
             assert(newState<4 && newState>=0);
 	    switch(state)  {
 	    case 0:
+	      ticks++;
 	      break;
 	    case 1:
+	      ticks++;
 	      break;
 	    case 3:
+	      ticks--;
 	      break;
 	    case 2:
+	      ticks--;
 	      break;
 	    default:
 	      break;
