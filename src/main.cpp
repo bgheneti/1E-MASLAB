@@ -22,7 +22,10 @@ void sig_handler(int signo) {
         running = 0;
     }
 }
-
+void angleTest(map::AngleLocalizer al, int numReadings){
+  std::cout << al.getAngle(10) << std::endl;
+  
+}
 int main() {
     signal(SIGINT, sig_handler);
     // Motor setup
@@ -56,16 +59,19 @@ int main() {
     firmware::Rangefinder front(0, 6, 16);
     firmware::Rangefinder right(1, 8, 17);
     
-    map::Map m("test_map.txt");
+    map::Map m("current_map.txt");
+    //m.print();
     
     map::AngleLocalizer al(front, right, dt, m);
     
     utils::Point currLoc = m.getLocation();
     al.setLocation(currLoc.x, currLoc.y);
     
-    std::cout << al.getAngle(10) << std::endl;
-    
-    
+    std::thread thr = std::thread(angleTest, al, 10);
+    while(running){
+      usleep(10000);
+    }
+    thr.~thread();
     //usleep(500000);
     //std::cout << "running" << std::endl;
     //dt.straightForDistance(1.0);

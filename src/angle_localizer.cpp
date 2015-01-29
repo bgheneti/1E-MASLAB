@@ -17,7 +17,7 @@ namespace map{
         probMap.push_back(b);
         for (int c = 0; c < g[0].size(); c++){
           e = g[r][c];
-          if (e == WALL || e == OUT_OF_BOUNDS){probMap[r].push_back(1);}
+          if (e == WALL){probMap[r].push_back(1);}
           else{probMap[r].push_back(0);}
           
         }
@@ -87,16 +87,18 @@ namespace map{
     std::cout << "stepping " << stepTh << std::endl;
     
     while(currTh < upperBound){
-      for (int i = 0; i < 10; i++){
+      for (int i = 0; i < 5; i++){
         front.getHighestProbDistance();
         right.getHighestProbDistance();
       }
-      readings[(int)currTh] = front.getHighestProbDistance();
-      readings[((int)currTh+90)%360] = right.getHighestProbDistance();
+      readings[(int)currTh] = front.getHighestProbDistance()/10;
+      readings[((int)currTh+90)%360] = right.getHighestProbDistance()/10;
       dt.turnForDegrees(stepTh);
+      
       currTh += stepTh;
-      std::cout << "reached " << currTh << std::endl;;
+      std::cout << "reached " << currTh << std::endl;
     }
+    
     std::cout << "done turning" << std::endl;
     return getMax(expected, readings, lowerBound, upperBound);
   }
