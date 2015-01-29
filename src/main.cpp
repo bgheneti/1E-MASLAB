@@ -47,6 +47,9 @@ int main() {
     // Set up encoders 
     firmware::Encoder leftEncoder(3,2);
     firmware::Encoder rightEncoder(4,5);
+    leftEncoder.startPolling();
+    rightEncoder.startPolling();
+
     drive::DriveTrain driveCtrl(leftMotor,rightMotor,leftEncoder,rightEncoder,gyro);
    
     // Set up pickup 
@@ -57,34 +60,38 @@ int main() {
     control::Pickup pickup = control::Pickup(pickupMotor,sorter,limitSwitch, colorSensor);
 
     // Set up dropoff
-    firmware::Servo rightFloor = firmware::Servo(6);
-    firmware::Servo leftFloor = firmware::Servo(7);
+    firmware::Servo rightFloor = firmware::Servo(7);
+    firmware::Servo leftFloor = firmware::Servo(6);
     firmware::Servo leftOpener = firmware::Servo(9);
     firmware::Servo rightOpener = firmware::Servo(8);
+    leftOpener.off();
+    rightOpener.off(); 
     control::Dropoff leftStack(leftFloor, leftOpener, 1);
-    control::Dropoff rightStack(rightFloor, rightOpener, -1);
+    control::Dropoff rightStack(rightFloor, rightOpener, -1); 
     rightStack.resetStack();
     leftStack.resetStack();
- 
-    driveCtrl.straightForDistance(0.25);
+
+
+//    driveCtrl.turnForDegrees(30.0);
 /*    pickup.start();
     driveCtrl.straightForDistance(0.3);
     usleep(10000000);
     pickup.stop();
- 
-    rightStack.dropStack();
+*/ 
+ /*   rightStack.dropStack();
     usleep(5000000);
     rightStack.resetStack();
     usleep(1000000);
     leftStack.dropStack();
     usleep(5000000);
     leftStack.resetStack();
-
-
-  leftMotor.setSpeed(0.0);
-  rightMotor.setSpeed(0.0);
 */
-  }
+
+
+  leftEncoder.stopPolling();
+  rightEncoder.stopPolling();
+  gyro.stopPoll();
+}
   
 
 

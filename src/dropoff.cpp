@@ -1,4 +1,5 @@
 #include "../include/dropoff.h"
+#include <iostream>
 
 namespace control {
 	Dropoff::Dropoff(firmware::Servo floor, 
@@ -12,8 +13,13 @@ namespace control {
 	}
 
 	void Dropoff::resetStack() {
-		floor.setServoPosition(45.0*dir);
-		opener.setServoPosition(-90.0);
+		std::cout << "reseting stack" << std::endl;
+		floor.setServoPosition(35.0*dir);
+		if(dir > 0) {
+			opener.setServoPosition(-76.0);
+		} else {
+			opener.setServoPosition(-85.0);
+		}
 	}
 
 }

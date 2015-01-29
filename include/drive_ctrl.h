@@ -11,12 +11,7 @@
 #include <time.h>
 #include <cmath>
 
-#define SPEED .25
-#define P (.0025 * 1.5)
-#define I (0.0000015 * 1.5)
-#define D (-0.05 *1.5)
-
-namespace drive {
+ namespace drive {
     
     class DriveTrain {
         private:
