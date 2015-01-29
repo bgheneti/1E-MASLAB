@@ -25,24 +25,30 @@ namespace map{
         
       }
       
+      //find a point that is known to be in the playing field
       utils::Point p = m.getNearestStack();
       int startX = p.x;
       int startY = p.y;
+      
+      //queue in which to store x and y pairs that are known to be in the playing field
       std::queue<int> xs, ys;
       xs.push(startX);
       ys.push(startY);
       int currX, currY;
-      while(xs.size() != 0){
-        currX = xs.front();
+      while(xs.size() != 0){ //while still looking
+        currX = xs.front(); //pull off first two values
         xs.pop();
         currY = ys.front();
         ys.pop();
+        //make sure that point is marked as clear
         probMap[currY][currX] = 0;
+        
+        //look for adjacent grid boxes that are known to be in the playing field
         if (currX + 1 < probMap[0].size() && probMap[currY][currX+1]==2){
-          xs.push(currX+1);
+          xs.push(currX+1); //add them to the queue
           ys.push(currY);
           probMap[currY][currX+1] = 0;
-        }
+        } //etc
         if (currX - 1 >= 0 && probMap[currY][currX-1] == 2){
           xs.push(currX-1);
           ys.push(currY);
@@ -59,12 +65,14 @@ namespace map{
           probMap[currY-1][currX] = 0;
         }
       }
-      for (int r = 0; r < probMap.size(); r++){
+      
+      //for now, print out probMap
+      /*for (int r = 0; r < probMap.size(); r++){
         for (int c = 0; c < probMap[r].size(); c++){
           std::cout << probMap[r][c];
         }
         std::cout << std::endl;
-      }
+      }*/
   }
   
   void AngleLocalizer::setLocation(int xl, int yl){
@@ -97,7 +105,7 @@ namespace map{
       //store expected distances
       expected[th] = sqrt((currX-(double)xLoc)*(currX-(double)xLoc) + (currY-(double)yLoc)*(currY-(double)yLoc));
       expected[th+360] = expected[th];
-      std::cout << th << ": " <<  expected[th] << std::endl;
+      //std::cout << th << ": " <<  expected[th] << std::endl;
       //reset
       currX = xLoc;
       currY = yLoc;
@@ -108,14 +116,17 @@ namespace map{
   int AngleLocalizer::getMax(std::vector<double> sta, std::vector<double> dyn, int lowerBound, int upperBound){
     std::cout << "getMax" << std::endl;
     std::vector<double> res(360, 0);
-    double max = 0;
+    double max = 1000000;
     int argmax = lowerBound;
     std::cout << "getMax starting loop" << std::endl;
     for (int n = lowerBound; n < upperBound; n++){
       for (int m = 0; m < 360; m++){
-        res[n] += (dyn[m]-sta[m+n])*(dyn[m]-sta[m+n]);
+        if (dyn[m] != 0){
+          res[n] += (dyn[m]-sta[m+n])*(dyn[m]-sta[m+n]);
+          //std::cout << dyn[m] << ", " << sta[m+n] << std::endl;
+        }
+        
       }
-      
       if (res[n] < max){
         max = res[n];
         argmax = n;
@@ -132,6 +143,22 @@ namespace map{
   int AngleLocalizer::getAngle(int numReadings, int lowerBound, int upperBound){
     std::cout << "getAngle" << std::endl;
     std::vector<double> readings(360, 0);
+    
+    
+    /*std::vector<double> testReadings(360, 0);
+    testReadings[0] = 3;
+    testReadings[36] = 16;
+    testReadings[72] = 12;
+    testReadings[108] = 5;
+    testReadings[144] = 6;
+    testReadings[180] = 16;
+    testReadings[216] = 2;
+    testReadings[252] = -1;
+    testReadings[288] = 1;
+    testReadings[324] = 1;
+    */
+    
+    
     double stepTh = (double)(upperBound - lowerBound) / numReadings;
     double currTh = lowerBound;
     std::cout << "stepping " << stepTh << std::endl;
@@ -145,6 +172,7 @@ namespace map{
       readings[((int)currTh+90)%360] = right.getHighestProbDistance()/10;
       dt.turnForDegrees(stepTh);
       
+      //readings[(int)currTh] = testReadings[(int)currTh];
       currTh += stepTh;
       std::cout << "reached " << currTh << std::endl;
     }

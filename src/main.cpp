@@ -23,7 +23,7 @@ void sig_handler(int signo) {
     }
 }
 void angleTest(map::AngleLocalizer al, int numReadings){
-  std::cout << al.getAngle(10) << std::endl;
+  std::cout << "angle" << al.getAngle(10) << std::endl;
   
 }
 int main() {
@@ -58,9 +58,7 @@ int main() {
     
     firmware::Rangefinder front(0, 6, 16);
     firmware::Rangefinder right(1, 8, 17);
-    std::cout << "asdf" << std::endl;
     map::Map m("current_map.txt");
-    std::cout << "fasd" << std::endl;
     //m.print();
     
     map::AngleLocalizer al(front, right, dt, m);
