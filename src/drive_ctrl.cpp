@@ -6,9 +6,9 @@
 #include <chrono>
 #include <iostream>
 #define SPEED 0.25
-#define P .1
+#define P .05
 #define I 0.00000
-#define D 0
+#define D -2.5
 namespace drive {
 
     DriveTrain::DriveTrain(firmware::Motor &leftMotor, 
@@ -27,7 +27,8 @@ namespace drive {
     void DriveTrain::resetSensors() {
         leftEncoder.resetNumTicks();
         rightEncoder.resetNumTicks();
-        gyro.zeroAngle();
+        //gyro.zeroAngle();
+	std::cout << "angle zeroed" << std::endl;
     
     }
 
@@ -50,15 +51,16 @@ namespace drive {
         }
 
 	int correctAngleCount = 0;
-        while(leftEncoder.getDistance() < std::abs(distance) ||
+        while(std::abs(leftEncoder.getDistance()) < std::abs(distance) ||
               (distance < .0001 && correctAngleCount < 5 )) { 
+	    std::cout << (distance < .0001) << "no distance" << std::endl;
 	    if(std::abs(heading - gyro.getAngle()) < 1.0) {
 		correctAngleCount++;
 		std::cout << correctAngleCount << "correct angle count" << std::endl;
 	    } else {
 		correctAngleCount = 0;
 	    }
-            double diff = heading - gyro.getAngle();
+            double diff = (heading - gyro.getAngle());
             std::cout << gyro.getAngle() << std::endl;
 
             gettimeofday(&currentTime, NULL);

@@ -46,16 +46,17 @@ int main() {
     firmware::Gyro gyro(10);
     gyro.startPoll();
     usleep(500000);
-    
-  
+    std::cout << "initial gyro angle" << gyro.getAngle() << std::endl;    
+    usleep(4000000);
+    std::cout << "final gyro angle" << gyro.getAngle() << std::endl;    
     // Set up encoders 
     firmware::Encoder leftEncoder(3,2);
     firmware::Encoder rightEncoder(4,5);
-    leftEncoder.startPolling();
+/*    leftEncoder.startPolling();
     rightEncoder.startPolling();
 
     drive::DriveTrain driveCtrl(leftMotor,rightMotor,leftEncoder,rightEncoder,gyro);
-   
+*/   
     // Set up pickup 
     firmware::Motor pickupMotor = firmware::Motor(4,5);
     firmware::Servo sorter = firmware::Servo(10);
@@ -75,7 +76,7 @@ int main() {
     rightStack.resetStack();
     leftStack.resetStack();
 
-    driveCtrl.turnForDegrees(60.0);
+//    driveCtrl.turnForDegrees(60.0);
 
 /*    pickup.start();
     driveCtrl.straightForDistance(0.3);
@@ -92,9 +93,9 @@ int main() {
 */
 
 
-  leftEncoder.stopPolling();
-  rightEncoder.stopPolling();
-  gyro.stopPoll();
+ // leftEncoder.stopPolling();
+ // rightEncoder.stopPolling(); 
+  gyro.stopPoll(); 
 }
   
 
