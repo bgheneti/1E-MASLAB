@@ -34,16 +34,20 @@ void sig_handler(int signo) {
 
 int main() {
     signal(SIGINT, sig_handler);
-   
-    // Set up gyro 
-    firmware::Gyro gyro(10);
-    gyro.startPoll();
-    usleep(1000000);
-    
+ 
     // Initialize motors
     firmware::Motor leftMotor(0, 1);
     firmware::Motor rightMotor(2, 3);
    
+    // Set up gyro 
+    rightMotor.setSpeed(0.0);
+    leftMotor.setSpeed(0.0);
+    usleep(500000);
+    firmware::Gyro gyro(10);
+    gyro.startPoll();
+    usleep(500000);
+    
+  
     // Set up encoders 
     firmware::Encoder leftEncoder(3,2);
     firmware::Encoder rightEncoder(4,5);
@@ -71,8 +75,8 @@ int main() {
     rightStack.resetStack();
     leftStack.resetStack();
 
+    driveCtrl.turnForDegrees(60.0);
 
-//    driveCtrl.turnForDegrees(30.0);
 /*    pickup.start();
     driveCtrl.straightForDistance(0.3);
     usleep(10000000);

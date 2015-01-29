@@ -5,10 +5,10 @@
 #include <sys/time.h>
 #include <chrono>
 #include <iostream>
-#define SPEED 0.0
-#define P .0025 
-#define I 0 
-#define D 0 
+#define SPEED 0.25
+#define P .1
+#define I 0.00000
+#define D 0
 namespace drive {
 
     DriveTrain::DriveTrain(firmware::Motor &leftMotor, 
@@ -34,6 +34,7 @@ namespace drive {
 
     // Control the robot's motion.
     void DriveTrain::controlPID(double distance, double heading) {
+	
         struct timeval currentTime;
         gettimeofday(&currentTime, NULL);
 	double currentMS = ((double)currentTime.tv_sec)*1000.0 +
@@ -47,10 +48,18 @@ namespace drive {
         } else {
             bias = 0;
         }
+
+	int correctAngleCount = 0;
         while(leftEncoder.getDistance() < std::abs(distance) ||
-              (distance < .0001 && std::abs(heading - gyro.getAngle()) > 1.0 )) { 
+              (distance < .0001 && correctAngleCount < 5 )) { 
+	    if(std::abs(heading - gyro.getAngle()) < 1.0) {
+		correctAngleCount++;
+		std::cout << correctAngleCount << "correct angle count" << std::endl;
+	    } else {
+		correctAngleCount = 0;
+	    }
             double diff = heading - gyro.getAngle();
-            std::cout << diff << std::endl;
+            std::cout << gyro.getAngle() << std::endl;
 
             gettimeofday(&currentTime, NULL);
             double newCurrentMS = ((double)currentTime.tv_sec)*1000.0 +

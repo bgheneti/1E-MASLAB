@@ -23,18 +23,53 @@ namespace firmware
 
     Encoder::Encoder(int inputPin1, int inputPin2) : gpio1(inputPin1), gpio2(inputPin2) {
         state = gpio1.read()<<1 + gpio2.read();
-        for(int i=0; i<4; i++) {stateTicks[i]=0;}
+        ticks=0;
         running = false;
     }
 
     // Read the value on the pins repeatedly and stores the state.
     void Encoder::poll() {
         while(running) {
-            int newState = (gpio1.read()<<1) + gpio2.read();;
+            unsigned char newState = (gpio1.read()<<1) + gpio2.read();;
             assert(newState<4 && newState>=0);
             if(newState != state) {
-                state = newState;
-                stateTicks[state]++;
+	      switch(state)  {  //If newState is the next/previous cycle state, increment/decrement counter
+	      case 0:
+		if(newState == 1)  {
+		  ticks++;
+		}
+		else if(newState == 2)  {
+		  ticks--;
+		}
+		break;
+	      case 1:
+		if(newState == 3)  {
+		  ticks++;
+		}
+		else if(newState == 0)  {
+		  ticks--;
+		}
+		break;
+	      case 3:
+		if(newState == 2)  {
+		  ticks++;
+		}
+		else if(newState == 1)  {
+		  ticks--;
+		}
+		break;
+	      case 2:
+		if(newState == 0)  {
+		  ticks++;
+		}
+		else if(newState == 3)  {
+		  ticks--;
+		}
+		break;
+	      default:
+		break;
+	      }
+              state = newState;
             }
         }
     }
@@ -57,21 +92,16 @@ namespace firmware
     // Returns the max of the stateTicks array because it is possible we skipped a state
     // by mistake somewhere.
     double Encoder::getDistance() {
-        int maxTicks=0;
-        for(int i=0; i<4; i++) {
-            if(stateTicks[i] > maxTicks) {
-                maxTicks = stateTicks[i];
-            }
-        }
-        // 480 is ticks per rotation
-        // 0.0492125 is radius of wheel in meters
-	// 7.0104 is the constant scaling factor from tuning
-        return ((double) maxTicks) / 480.0 * 0.0492125 * 7.0104;
+      // 480 is ticks per rotation
+      // 0.0492125 is radius of wheel in meters
+      // 7.0104 is the constant scaling factor from tuning
+      // 4 is for back-compatibility; updated code counts 1 tick per state, old code 1 tick per cycle
+      return ((double) ticks) / 480.0 * 0.0492125 * 7.0104 / 4;
     }
 
     // Reset the number of ticks to 0.
     void Encoder::resetNumTicks() {
-        for(int i=0; i<4; i++) {stateTicks[i]=0;}
+        ticks=0;
     }
 
 }  

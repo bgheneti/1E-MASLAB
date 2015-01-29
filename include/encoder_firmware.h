@@ -9,8 +9,8 @@ namespace firmware {
         private:
             mraa::Gpio gpio1; // the pins the encoder is attached to
             mraa::Gpio gpio2; // the pins the encoder is attached to
-            int state; // the state the encoder is currently in (0-3).
-            int stateTicks[4]; // keeps track of the number of times each state is read
+            unsigned char state; // the state the encoder is currently in (0-3).
+            int ticks; // keeps track of the number of encoder cycles
             bool running;
             std::thread runner;
             void poll();
