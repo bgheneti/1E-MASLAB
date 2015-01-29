@@ -63,10 +63,10 @@ namespace map{
     std::cout << "getMax starting loop" << std::endl;
     for (int n = lowerBound; n < upperBound; n++){
       for (int m = 0; m < 360; m++){
-        res[n] += dyn[m]*sta[m+n];
+        res[n] += (dyn[m]-sta[m+n])*(dyn[m]-sta[m+n]);
       }
       
-      if (res[n] > max){
+      if (res[n] < max){
         max = res[n];
         argmax = n;
       }
