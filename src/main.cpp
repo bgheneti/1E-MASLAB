@@ -46,17 +46,20 @@ int main() {
     firmware::Gyro gyro(10);
     gyro.startPoll();
     usleep(500000);
-    std::cout << "initial gyro angle" << gyro.getAngle() << std::endl;    
-    usleep(4000000);
-    std::cout << "final gyro angle" << gyro.getAngle() << std::endl;    
-    // Set up encoders 
-    firmware::Encoder leftEncoder(3,2);
-    firmware::Encoder rightEncoder(4,5);
-    leftEncoder.startPolling();
-    rightEncoder.startPolling();
-
-    drive::DriveTrain driveCtrl(leftMotor,rightMotor,leftEncoder,rightEncoder,gyro);
    
+    // Set up encoders
+    mraa::Gpio leftEncoderPin1(3);
+    mraa::Gpio leftEncoderPin2(2); 
+    firmware::Encoder leftEncoder(leftEncoderPin1, leftEncoderPin2);
+    //firmware::Encoder rightEncoder(4,5);
+    leftEncoder.startPolling();
+    //rightEncoder.startPolling();
+    while(running) {
+      std::cout << gyro.getAngle() << ' ';
+      std::cout << leftEncoder.getDistance()<<std::endl;
+      usleep(300000);
+    }
+    /*
     // Set up pickup 
     firmware::Motor pickupMotor = firmware::Motor(4,5);
     firmware::Servo sorter = firmware::Servo(10);
@@ -75,7 +78,7 @@ int main() {
     control::Dropoff rightStack(rightFloor, rightOpener, -1); 
     rightStack.resetStack();
     leftStack.resetStack();
-
+    */
 //    driveCtrl.turnForDegrees(60.0);
 
 /*    pickup.start();
@@ -93,9 +96,10 @@ int main() {
 */
 
 
- // leftEncoder.stopPolling();
- // rightEncoder.stopPolling(); 
+    leftEncoder.stopPolling();
+    //rightEncoder.stopPolling(); 
   gyro.stopPoll(); 
+  return 0;
 }
   
 
