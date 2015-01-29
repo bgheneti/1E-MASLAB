@@ -32,22 +32,10 @@ namespace firmware
         while(running) {
             int newState = (gpio1.read()<<1) + gpio2.read();;
             assert(newState<4 && newState>=0);
-	    switch(state)  {
-	    case 0:
-	      ticks++;
-	      break;
-	    case 1:
-	      ticks++;
-	      break;
-	    case 3:
-	      ticks--;
-	      break;
-	    case 2:
-	      ticks--;
-	      break;
-	    default:
-	      break;
+	    if(newState == 2 || newState == 3)  {
+	      newState ^= 1;  //toggles LSB, converts 2<-->3
 	    }
+	    ticks += newState - state;
             state = newState;
         }
     }
@@ -70,11 +58,10 @@ namespace firmware
     // Returns the max of the stateTicks array because it is possible we skipped a state
     // by mistake somewhere.
     double Encoder::getDistance() {
-        int maxTicks=0;
                 // 480 is ticks per rotation
         // 0.0492125 is radius of wheel in meters
 	// 7.0104 is the constant scaling factor from tuning
-        return ((double) maxTicks) / 480.0 * 0.0492125 * 7.0104;
+        return ((double) ticks) / 480.0 * 0.0492125 * 7.0104 / 4;
     }
 
     // Reset the number of ticks to 0.

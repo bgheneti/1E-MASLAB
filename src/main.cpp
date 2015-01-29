@@ -52,11 +52,11 @@ int main() {
     // Set up encoders 
     firmware::Encoder leftEncoder(3,2);
     firmware::Encoder rightEncoder(4,5);
-/*    leftEncoder.startPolling();
+    leftEncoder.startPolling();
     rightEncoder.startPolling();
 
     drive::DriveTrain driveCtrl(leftMotor,rightMotor,leftEncoder,rightEncoder,gyro);
-*/   
+   
     // Set up pickup 
     firmware::Motor pickupMotor = firmware::Motor(4,5);
     firmware::Servo sorter = firmware::Servo(10);
