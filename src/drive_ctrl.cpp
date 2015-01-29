@@ -7,7 +7,7 @@
 #include <iostream>
 #define SPEED 0.25
 #define P .037
-#define I 0.0000024
+#define I 0.0000048
 #define D -2.3
 namespace drive {
 

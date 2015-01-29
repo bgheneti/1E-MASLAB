@@ -3,7 +3,7 @@
 #include <iostream>
 
 #include "../include/motor_firmware.h"
-
+#define minThreshold .15
 // This file contains the code to control a motor on a basic level.
 // These motors can be driving motors or other motors.
 namespace firmware {
@@ -21,6 +21,14 @@ namespace firmware {
 		setSpeed = 0.5;
 	} else if (setSpeed < -.5) {
 		setSpeed = -.5;
+	}
+	else if(setSpeed>-minThreshold && setSpeed<-0.05){
+	  setSpeed=-minThreshold;
+	  std::cout<<"setThreshold"<<std::endl;
+	} else if (setSpeed<minThreshold && setSpeed>0.05){
+	  setSpeed=minThreshold;
+	} else if (std::abs(setSpeed)<=.05){
+	  setSpeed=0;
 	}
         assert(-0.5 <= setSpeed && setSpeed <= 0.5);
         if (setSpeed > 0) {
