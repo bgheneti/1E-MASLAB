@@ -2,6 +2,7 @@
 #include <vector>
 #include <math.h>
 #include <iostream>
+#include <queue>
 #define PI 3.14159
 namespace map{
   AngleLocalizer::AngleLocalizer(firmware::Rangefinder &front,
@@ -18,10 +19,47 @@ namespace map{
         for (int c = 0; c < g[0].size(); c++){
           e = g[r][c];
           if (e == WALL){probMap[r].push_back(1);}
-          else{probMap[r].push_back(0);}
+          else{probMap[r].push_back(2);}
           
         }
         
+      }
+      
+      utils::Point p = m.getNearestStack();
+      int startX = p.x;
+      int startY = p.y;
+      std::queue<int> xs, ys;
+      xs.push(startX);
+      ys.push(startY);
+      int currX, currY;
+      while(xs.size() != 0){
+        currX = xs.front();
+        xs.pop();
+        currY = ys.front();
+        ys.pop();
+        probMap[currY][currX] = 0;
+        if (currX + 1 < probMap[0].size() && probMap[currY][currX+1]==2){
+          xs.push(currX+1);
+          ys.push(currY);
+        }
+        if (currX - 1 >= 0 && probMap[currY][currX+1] == 2){
+          xs.push(currX-1);
+          ys.push(currY);
+        }
+        if (currY + 1 < probMap.size() && probMap[currY+1][currX] == 2){
+          xs.push(currX);
+          ys.push(currY+1);
+        }
+        if (currY - 1 >= 0 && probMap[currY-1][currX] == 2){
+          xs.push(currX);
+          ys.push(currY-1);
+        }
+      }
+      for (int r = 0; r < probMap.size(); r++){
+        for (int c = 0; c < probMap[r].size(); c++){
+          std::cout << probMap[r][c];
+        }
+        std::cout << std::endl;
       }
   }
   
@@ -35,19 +73,20 @@ namespace map{
     //for each angle
     for(int th = 0; th < 360; th++){
       //for this angle, where th=0 is directly upwards, the change in x and y
-      stepX = sin(th*PI/180);
-      stepY = cos(th*PI/180);
-      
+      stepX = sin(th*PI/180.0)/2;
+      stepY = cos(th*PI/180.0)/2;
+      //std::cout << stepX << ", " << stepY << std::endl;
       //step until a wall is found.
-      while (probMap[(int)currY][(int)currX] == 0){
+      while ((((int)xLoc == (int)currX) && ((int)yLoc == (int)currY)) || probMap[(int)currY][(int)currX] == 0){
         currX += stepX;
         currY += stepY;
+        //std::cout << "a" << std::endl;
       }
       
       //store expected distances
       expected[th] = sqrt((currX-xLoc)*(currX-xLoc) + (currY-yLoc)*(currY-yLoc));
       expected[th+360] = expected[th];
-      
+      std::cout << th << ": " <<  expected[th] << std::endl;
       //reset
       currX = xLoc;
       currY = yLoc;
