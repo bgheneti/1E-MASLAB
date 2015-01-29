@@ -115,25 +115,30 @@ namespace map{
   
   int AngleLocalizer::getMax(std::vector<double> sta, std::vector<double> dyn, int lowerBound, int upperBound){
     std::cout << "getMax" << std::endl;
+    
+    //results
     std::vector<double> res(360, 0);
-    double max = 1000000;
-    int argmax = lowerBound;
+    double min = 1000000; //obscenely large starting minimum
+    int argmin = lowerBound; //default argmax
     std::cout << "getMax starting loop" << std::endl;
+    
+    //for every possible shift
     for (int n = lowerBound; n < upperBound; n++){
+      //integrate
       for (int m = 0; m < 360; m++){
-        if (dyn[m] != 0){
-          res[n] += (dyn[m]-sta[m+n])*(dyn[m]-sta[m+n]);
+        if (dyn[m] != 0){//if a measurement exists for this m
+          res[n] += (dyn[m]-sta[m+n])*(dyn[m]-sta[m+n]); //add the difference squared
           //std::cout << dyn[m] << ", " << sta[m+n] << std::endl;
         }
-        
+        //otherwise do nothing
       }
-      if (res[n] < max){
-        max = res[n];
-        argmax = n;
+      if (res[n] < min){ //if found a new minimum
+        min = res[n]; //update
+        argmin = n;
       }
     }
     std::cout << "max gotten" << std::endl;
-    return argmax;
+    return argmin;
   }
   
   int AngleLocalizer::getAngle(int numReadings){
@@ -158,22 +163,23 @@ namespace map{
     testReadings[324] = 1;
     */
     
-    
+    //iterate through angles to take 'numReadings' measurements
     double stepTh = (double)(upperBound - lowerBound) / numReadings;
     double currTh = lowerBound;
     std::cout << "stepping " << stepTh << std::endl;
     
     while(currTh < upperBound){
-      for (int i = 0; i < 5; i++){
+      for (int i = 0; i < 5; i++){//update because of low-pass filter
         front.getHighestProbDistance();
         right.getHighestProbDistance();
       }
+      //take readings, turn
       readings[(int)currTh] = front.getHighestProbDistance()/10;
       readings[((int)currTh+90)%360] = right.getHighestProbDistance()/10;
       dt.turnForDegrees(stepTh);
       
       //readings[(int)currTh] = testReadings[(int)currTh];
-      currTh += stepTh;
+      currTh += stepTh; //add
       std::cout << "reached " << currTh << std::endl;
     }
     
