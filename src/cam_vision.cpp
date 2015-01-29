@@ -274,8 +274,6 @@ namespace vision{
       cap >> frame;
       processFrame(frame, out);
       findCubes(out);
-      //imshow( "Display window", oldOut);
-      outVid << out;
     }
   }
 

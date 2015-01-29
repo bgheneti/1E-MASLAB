@@ -31,7 +31,10 @@ void sig_handler(int signo) {
         running = 0;
     }
 }
-
+void angleTest(map::AngleLocalizer al, int numReadings){
+  std::cout << "angle" << al.getAngle(10) << std::endl;
+  
+}
 int main() {
     signal(SIGINT, sig_handler);
  
