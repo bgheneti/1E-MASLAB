@@ -32,7 +32,18 @@ namespace firmware
         while(running) {
             int newState = (gpio1.read()<<1) + gpio2.read();;
             assert(newState<4 && newState>=0);
-	    
+	    switch(state)  {
+	    case 0:
+	      break;
+	    case 1:
+	      break;
+	    case 3:
+	      break;
+	    case 2:
+	      break;
+	    default:
+	      break;
+	    }
             state = newState;
         }
     }
