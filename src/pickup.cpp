@@ -63,9 +63,9 @@ namespace control {
 	      colorSensor.stopPoll();
 	    }
 	    sorter.setServoPosition(SORT_CENTER+2);
-	    usleep(30000);
+	    usleep(100000);
 	    sorter.setServoPosition(SORT_CENTER-2);
-	    usleep(30000);
+	    usleep(100000);
 	  }
 	  usleep(50000);
 	  pickupMotor.setSpeed(0.0);

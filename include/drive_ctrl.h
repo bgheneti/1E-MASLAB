@@ -29,7 +29,7 @@
             bool driving;
             // Zero the encoders and gyro
             void resetSensors();
-            double controlPID(double distance, double heading, double tolerance, double wallAllowance);
+            double controlPID(double distance, double heading, double tolerance, double wallAllowance, double timeout);
 
 
         public:
@@ -44,11 +44,11 @@
 
             // Move straight for some distance. If distance > 0, forward
             // otherwise backward.
-            double straightForDistance(double distance, double wallAllowance);
+            double straightForDistance(double distance, double wallAllowance, double timeout);
 
             // Have the robot turn for some number of degrees. If degrees
             // is negative, turn left; if positive turn right.
-            double turnForDegrees(double degrees, double tolerance);
+            double turnForDegrees(double degrees, double tolerance, double timeout);
 
     };
 

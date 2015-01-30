@@ -28,7 +28,8 @@ namespace vision{
 	    std::vector<std::vector<int> > findPoints(Mat& inFrame);
 	    std::vector<Block> blocks;
         public:	  
-	    map::DrivingInstruction getDirectionToBlock(double distance, double heading);
+	    map::DrivingInstruction getStackDirection(double distance, double heading);
+	    map::DrivingInstruction getBlockDirection();
 	    void startPoll();
 	    void stopPoll();
 	    std::vector<Block> getBlocks();

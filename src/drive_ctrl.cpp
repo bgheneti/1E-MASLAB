@@ -37,13 +37,16 @@ namespace drive {
 
 
     // Control the robot's motion.
-    double DriveTrain::controlPID(double distance, double heading, double tolerance, double wallAllowance) {
+    double DriveTrain::controlPID(double distance, double heading, double tolerance, double wallAllowance, double timeout) {
       // std::cout << "entered driveControl, tolerance="<<tolerance << std::endl;
+
+	double timeSoFar = 0;
 	
         struct timeval currentTime;
         gettimeofday(&currentTime, NULL);
 	double currentMS = ((double)currentTime.tv_sec)*1000.0 +
 			   ((double)currentTime.tv_usec)/1000.0;
+	double startTime = currentMS/1000;
         double integral = 0;
         resetSensors();
         if(distance > 0) {
@@ -57,7 +60,7 @@ namespace drive {
         //std::cout << "front " << front.getHighestProbDistance() << std::endl;
         while((front.getHighestProbDistance() > wallAllowance*100 || front.getHighestProbDistance() < 0) && 
               (std::abs(leftEncoder.getCount()) < std::abs(distance) ||
-              (distance < .0001 && correctAngleCount < 5 ))) {
+              (distance < .0001 && correctAngleCount < 5 ))&& timeSoFar < timeout) {
 //	    std::cout<<"distance="<<distance<<std::endl;
 //	    std::cout << (distance < .0001) << "no distance" << std::endl;
 	  double diff = (heading - gyro.getAngle())+angleOffset;
@@ -70,11 +73,12 @@ namespace drive {
 		correctAngleCount = 0;
 	    }
 
-
             gettimeofday(&currentTime, NULL);
             double newCurrentMS = ((double)currentTime.tv_sec)*1000.0 +
                                   ((double)currentTime.tv_usec)/1000.0;
+            timeSoFar = newCurrentMS/1000.0 - startTime;
             double dT = newCurrentMS - currentMS;
+            std::cout << timeSoFar << " time " << timeout << std::endl; 
             currentMS = newCurrentMS;
             integral += diff * dT;
             double derivative = gyro.getAngularV();
@@ -87,6 +91,7 @@ namespace drive {
             usleep(5000);
             
         }
+	if(timeSoFar >= timeout) { std::cout << "TIMEOUT Drive control" << std::endl;}
         if(!(front.getHighestProbDistance() > wallAllowance*100 || front.getHighestProbDistance() < 0)){std::cout << "STOPPED BECAUSE TOO CLOSE TO WALL" << std::endl;}
 	leftMotor.setSpeed(0.0);
         rightMotor.setSpeed(0.0);
@@ -95,16 +100,16 @@ namespace drive {
         return leftEncoder.getCount();
     }
 
-    double DriveTrain::straightForDistance(double distance, double wallAllowance) {
-        return controlPID(distance, 0.0, 1.0, wallAllowance);
+    double DriveTrain::straightForDistance(double distance, double wallAllowance, double timeout) {
+        return controlPID(distance, 0.0, 1.0, wallAllowance, timeout);
     }
             
     // Have the robot turn for some number of degrees. If degrees
     // is negative, turn left; if positive turn right.
-    double DriveTrain::turnForDegrees(double degrees, double tolerance) {
+    double DriveTrain::turnForDegrees(double degrees, double tolerance, double timeout) {
         if (std::abs(degrees) > std::abs(tolerance)){
           std::cout <<"turning " <<  degrees << ", " << tolerance << std::endl;
-          controlPID(0.0, degrees, tolerance, 0.0);
+          controlPID(0.0, degrees, tolerance, 0.0, timeout);
         }
         else{
           std::cout << "STOPPED BECAUSE ANGLE TO TURN WAS TOO SMALL " << degrees << ", " << tolerance << std::endl;

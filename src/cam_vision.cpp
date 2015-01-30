@@ -338,14 +338,13 @@ namespace vision{
   }
 
   
-  map::DrivingInstruction Cam::getDirectionToBlock(double distance, double heading){
-     usleep(1500000);
+  map::DrivingInstruction Cam::getStackDirection(double distance, double heading){
+     usleep(1000000);
      std::vector<Block> stacks=blocks;
      map::DrivingInstruction closestStack;
-     if(stacks.size()>0){
-       double minDiff=DBL_MAX;
-       closestStack=map::DrivingInstruction(0,minDiff);
-       for(int i=0;i<stacks.size();i++){
+     double minDiff=DBL_MAX;
+     closestStack=map::DrivingInstruction(0,minDiff);
+     for(int i=0;i<stacks.size();i++){
 	 double stackHeading=stacks[i].getAngle();
 	 double stackDistance=stacks[i].getDistance();
 	 double diffX=sin(heading/180*pi)*distance-sin(stackHeading/180*pi)*stackDistance;
@@ -355,8 +354,24 @@ namespace vision{
 	   minDiff=diff;
 	   closestStack=map::DrivingInstruction(stackHeading,stackDistance);
 	 }
-       }
      }
      return closestStack;
+  }
+
+  map::DrivingInstruction Cam::getBlockDirection(){
+    usleep(1000000);
+    std::vector<Block> closeBlocks=blocks;
+    map::DrivingInstruction closestBlock;
+    double minDist=DBL_MAX;
+    closestBlock=map::DrivingInstruction(0,minDist);
+    for(int i=0;i<closeBlocks.size();i++){
+	double blockHeading=closeBlocks[i].getAngle();
+	double blockDistance=closeBlocks[i].getDistance();
+	if(blockDistance<minDist){
+	  minDist=blockDistance;
+	  closestBlock=map::DrivingInstruction(blockHeading,blockDistance);
+	}
+    }    
+    return closestBlock;
   }
 }

@@ -190,7 +190,7 @@ namespace map{
       //take readings, turn
       readings[(int)currTh] = (fAverage+2)/10;
       readings[((int)currTh+90)%360] = (rAverage+5)/10;
-      dt.turnForDegrees(stepTh, 2.5);
+      //dt.turnForDegrees(stepTh, 2.5);
       //std::cout << readings[(int)currTh]<<", " << readings[((int)currTh+90)%360] << std::endl;
       //readings[(int)currTh] = testReadings[(int)currTh];
       currTh += stepTh; //add

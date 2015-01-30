@@ -16,8 +16,6 @@ class Robot {
 		control::Pickup& pickup;
 		control::Dropoff& dropoffLeft;
 		control::Dropoff& dropoffRight;
-		map::Map& map;
-		map::AngleLocalizer& angleLocalizer;
 		utils::Color mode;
 		vision::Cam& cam;
 		double driveStraightNormal(double distance);
@@ -26,10 +24,8 @@ class Robot {
 	public:
 		// In addition to constructing the object, it also localizes
 		Robot(drive::DriveTrain& driveCtrl, control::Pickup& pickup, control::Dropoff& dropoffLeft,
-		      control::Dropoff& dropoffRight, map::Map& map, map::AngleLocalizer& angleLocalizer, 
-		      vision::Cam& cam, utils::Color mode);
-		double driveToNearestStack(); 
-		void pickupStack();
+		      control::Dropoff& dropoffRight, vision::Cam& cam, utils::Color mode);
+		void pickupStack(map::DrivingInstruction instruction);
 
 };
 
