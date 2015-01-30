@@ -11,7 +11,7 @@ namespace firmware{
   
   //returns an estimate of distance
   double Rangefinder::getHighestProbDistance(){
-    double usN = 5, irN = 30; //number of samples for each sensor
+    double usN = 3, irN = 20; //number of samples for each sensor
     
     //whether the sensors should look for things in the range of 0-20 cm or 20-? cm
     bool close = (estimatedDistance != -1) && (estimatedDistance < 20);
@@ -26,7 +26,7 @@ namespace firmware{
     double irS = ir.getStdDev(close, irN, irReading);
     //std::cout << irDist << "\t" << irS << std::endl;
     double currDistance = -1; //the distance from this set of readings only
-    
+    //std::cout << irDist << "/t" << usDist << std::endl;
     //find an estimate of currDistance
     if (usDist == -1){//if no us reading was obtained
       currDistance = irDist; //use only the ir one
@@ -68,7 +68,7 @@ namespace firmware{
         //leave past estimates as they are
       }
       else{ //if there is current information
-        estimatedDistance = estimatedDistance*0.8+currDistance*0.2; //factor it in
+        estimatedDistance = estimatedDistance*0.5+currDistance*0.5; //factor it in
         longTermDistance = longTermDistance*0.99+currDistance*0.01;
       }
     }

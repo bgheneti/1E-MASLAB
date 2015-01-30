@@ -134,7 +134,7 @@ namespace map{
         }
         //otherwise do nothing
       }
-      std::cout << n << ": " << res[n] << std::endl;
+      //std::cout << n << ": " << res[n] << std::endl;
       if (res[n] < min){ //if found a new minimum
         min = res[n]; //update
         argmin = n;
@@ -173,13 +173,23 @@ namespace map{
     std::cout << "stepping " << stepTh << std::endl;
     
     while(currTh < upperBound){
-      /*for (int i = 0; i < 5; i++){//update because of low-pass filter
+      double fAverage = 0;
+      double rAverage = 0;
+      int numRdgs = 10;
+      for (int i = 0; i < numRdgs; i++){
         front.getHighestProbDistance();
         right.getHighestProbDistance();
-      }*/
+      }
+      for (int i = 0; i < numRdgs; i++){//update because of low-pass filter
+        fAverage += front.getHighestProbDistance();
+        rAverage += right.getHighestProbDistance();
+      }
+      fAverage /= numRdgs;
+      rAverage /= numRdgs;
+      std::cout << fAverage << "\t" << rAverage << std::endl;
       //take readings, turn
-      readings[(int)currTh] = (front.getHighestProbDistance()+2)/10;
-      readings[((int)currTh+90)%360] = (right.getHighestProbDistance()+5)/10;
+      readings[(int)currTh] = (fAverage+2)/10;
+      readings[((int)currTh+90)%360] = (rAverage+5)/10;
       dt.turnForDegrees(stepTh, 2.5);
       //std::cout << readings[(int)currTh]<<", " << readings[((int)currTh+90)%360] << std::endl;
       //readings[(int)currTh] = testReadings[(int)currTh];

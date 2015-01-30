@@ -13,7 +13,7 @@ Robot::Robot(drive::DriveTrain& driveCtrl, control::Pickup& pickup, control::Dro
 
 	// Localize
 	angleLocalizer.setLocation(map.getLocation().x, map.getLocation().y);
-	map.setHeading(angleLocalizer.getAngle(10));
+	map.setHeading(angleLocalizer.getAngle(15));
 	std::cout<<"angle localization results in an angle of "<<map.getHeading()<<std::endl;
 }
 
@@ -63,9 +63,9 @@ double Robot::driveToNearestStack() {
 
 	turnNormal(instructions[instructions.size()-1].heading);
 	double lastDistance = instructions[instructions.size()-1].distance;
-	if(lastDistance > 0.5) {
-		driveStraightNormal(lastDistance - 0.5);
-		lastDistance = 0.5;
+	if(lastDistance > 1) {
+		driveStraightNormal(lastDistance - 1);
+		lastDistance = 1;
 	} 
   
 	return lastDistance;
@@ -74,30 +74,41 @@ double Robot::driveToNearestStack() {
 }
 
 void Robot::pickupStack() {
+      bool pickupStarted = false;
       double expectedDistance = driveToNearestStack();
       std::cout<<"expectedDistance="<<expectedDistance<<std::endl;
-      while(expectedDistance > 0.3) {
+      while(expectedDistance > 0.0) {
       	map::DrivingInstruction instruction = cam.getDirectionToBlock(expectedDistance, 0.0);
-        expectedDistance = instruction.distance;
         if(instruction.distance < 0) {
-		std::cout << "camera can't see block" << std::endl;
-  	} 
+	  std::cout << "camera can't see block" << std::endl;
+	  expectedDistance += .3;
+	  driveStraightNormal(-.3);
+	  continue;
+	} 
+	else{
+	  expectedDistance = instruction.distance;
+	}
         std::cout<<"Driving towards block: "<<instruction.heading<<" degrees, "<<instruction.distance<<" meters" << std::endl;
       
         turnNormal(instruction.heading);
-	double distanceToTravel = expectedDistance <= 0.5 ? instruction.distance-.2 : 0.5;
-	expectedDistance -= .5;
-	driveStraightNormal(distanceToTravel);
-	}
-      pickup.start();
-      driveStraightNormal(.5);
-      for(int i=0; i<100; i++) {
-	if(pickup.getNumPickedUpThisTime()>3) {
+	if(expectedDistance >= 1.0) {
+		driveStraightNormal(0.5);
+		expectedDistance -= 0.5;
+	} else {
+		pickup.start();
+		driveStraightNormal(expectedDistance);
+	        for(int i=0; i<100; i++) {
+	            if(pickup.getNumPickedUpThisTime()>3) {
+		        break;
+	            }
+      	           usleep(10000000);
+                   pickup.stop();
+  		}	
 		break;
 	}
-      	usleep(10000000);
-      pickup.stop();
-     }
+		
+      }
+ }
 
 
-}
+
