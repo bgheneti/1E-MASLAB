@@ -6,7 +6,7 @@
 #include <thread>
 #include "cmath"
 #include "opencv2/opencv.hpp"
-
+#include "map.h"
 using namespace cv;
 
 namespace vision{
@@ -28,6 +28,7 @@ namespace vision{
 	    std::vector<std::vector<int> > findPoints(Mat& inFrame);
 	    std::vector<Block> blocks;
         public:	  
+	    map::DrivingInstruction getDirectionToBlock(double distance, double heading);
 	    void startPoll();
 	    void stopPoll();
 	    std::vector<Block> getBlocks();

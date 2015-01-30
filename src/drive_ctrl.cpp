@@ -7,7 +7,7 @@
 #include <iostream>
 #define SPEED 0.25
 #define P .037
-#define I 0.0000048
+#define I 0.000001
 #define D -2.3
 namespace drive {
 
@@ -15,14 +15,17 @@ namespace drive {
                            firmware::Motor &rightMotor,
                            firmware::Encoder &leftEncoder,
                            firmware::Encoder &rightEncoder,
-                           firmware::Gyro &gyro) : leftMotor(leftMotor),
+                           firmware::Gyro &gyro,
+                           firmware::Rangefinder &front) : leftMotor(leftMotor),
                                                    rightMotor(rightMotor),
                                                    leftEncoder(leftEncoder),
                                                    rightEncoder(rightEncoder),
                                                    gyro(gyro),
                                                    bias(0),
                                                    power(0),
-                                                   driving(false) {}
+         					   angleOffset(0),
+                                                   driving(false),
+       						   front(front) {}
 
     void DriveTrain::resetSensors() {
         leftEncoder.resetCount();
@@ -34,7 +37,8 @@ namespace drive {
 
 
     // Control the robot's motion.
-    void DriveTrain::controlPID(double distance, double heading) {
+    double DriveTrain::controlPID(double distance, double heading, double tolerance, double wallAllowance) {
+      // std::cout << "entered driveControl, tolerance="<<tolerance << std::endl;
 	
         struct timeval currentTime;
         gettimeofday(&currentTime, NULL);
@@ -50,18 +54,22 @@ namespace drive {
             bias = 0;
         }
 	int correctAngleCount = 0;
-        while(std::abs(leftEncoder.getCount()) < std::abs(distance) ||
-              (distance < .0001 && correctAngleCount < 5 )) {
-	    std::cout<<"distance="<<distance<<std::endl;
-	    std::cout << (distance < .0001) << "no distance" << std::endl;
-	    if(std::abs(heading - gyro.getAngle()) < 1.0) {
+        //std::cout << "front " << front.getHighestProbDistance() << std::endl;
+        while((front.getHighestProbDistance() > wallAllowance*100 || front.getHighestProbDistance() < 0) && 
+              (std::abs(leftEncoder.getCount()) < std::abs(distance) ||
+              (distance < .0001 && correctAngleCount < 5 ))) {
+//	    std::cout<<"distance="<<distance<<std::endl;
+//	    std::cout << (distance < .0001) << "no distance" << std::endl;
+	  double diff = (heading - gyro.getAngle())+angleOffset;
+	  //	  std::cout << diff << std::endl;
+
+	    if(std::abs(diff) < tolerance) {
 		correctAngleCount++;
-		std::cout << correctAngleCount << "correct angle count" << std::endl;
+		//std::cout << correctAngleCount << "correct angle count" << std::endl;
 	    } else {
 		correctAngleCount = 0;
 	    }
-            double diff = (heading - gyro.getAngle());
-            std::cout << gyro.getAngle() << std::endl;
+
 
             gettimeofday(&currentTime, NULL);
             double newCurrentMS = ((double)currentTime.tv_sec)*1000.0 +
@@ -76,20 +84,33 @@ namespace drive {
 	   
             leftMotor.setSpeed(leftMotorSpeed);
             rightMotor.setSpeed(rightMotorSpeed);
-            usleep(50000);
+            usleep(5000);
+            
         }
+        if(!(front.getHighestProbDistance() > wallAllowance*100 || front.getHighestProbDistance() < 0)){std::cout << "STOPPED BECAUSE TOO CLOSE TO WALL" << std::endl;}
 	leftMotor.setSpeed(0.0);
         rightMotor.setSpeed(0.0);
+        angleOffset = heading-gyro.getAngle();
+        
+        return leftEncoder.getCount();
     }
 
-    void DriveTrain::straightForDistance(double distance) {
-        controlPID(distance, 0.0);
+    double DriveTrain::straightForDistance(double distance, double wallAllowance) {
+        return controlPID(distance, 0.0, 1.0, wallAllowance);
     }
             
     // Have the robot turn for some number of degrees. If degrees
     // is negative, turn left; if positive turn right.
-    void DriveTrain::turnForDegrees(double degrees) {
-        controlPID(0.0, degrees);
+    double DriveTrain::turnForDegrees(double degrees, double tolerance) {
+        if (std::abs(degrees) > std::abs(tolerance)){
+          std::cout <<"turning " <<  degrees << ", " << tolerance << std::endl;
+          controlPID(0.0, degrees, tolerance, 0.0);
+        }
+        else{
+          std::cout << "STOPPED BECAUSE ANGLE TO TURN WAS TOO SMALL " << degrees << ", " << tolerance << std::endl;
+        }
+        return gyro.getAngle();
     }
+    
 
 }

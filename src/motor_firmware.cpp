@@ -22,14 +22,15 @@ namespace firmware {
 	} else if (setSpeed < -.5) {
 		setSpeed = -.5;
 	}
-	else if(setSpeed>-minThreshold && setSpeed<-0.05){
+/*	else if(setSpeed>-minThreshold && setSpeed<-0.03){
 	  setSpeed=-minThreshold;
 	  std::cout<<"setThreshold"<<std::endl;
-	} else if (setSpeed<minThreshold && setSpeed>0.05){
+	} else if (setSpeed<minThreshold && setSpeed>0.03){
 	  setSpeed=minThreshold;
-	} else if (std::abs(setSpeed)<=.05){
+	} else if (std::abs(setSpeed)<=.03){
 	  setSpeed=0;
 	}
+*/
         assert(-0.5 <= setSpeed && setSpeed <= 0.5);
         if (setSpeed > 0) {
             dir.write(1.0);

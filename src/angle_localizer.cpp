@@ -73,6 +73,8 @@ namespace map{
         }
         std::cout << std::endl;
       }*/
+
+      std::cout << "finished constructing localizer" << std::endl;
   }
   
   void AngleLocalizer::setLocation(int xl, int yl){
@@ -105,7 +107,7 @@ namespace map{
       //store expected distances
       expected[th] = sqrt((currX-(double)xLoc)*(currX-(double)xLoc) + (currY-(double)yLoc)*(currY-(double)yLoc));
       expected[th+360] = expected[th];
-      //std::cout << th << ": " <<  expected[th] << std::endl;
+      std::cout << th << ": " <<  expected[th] << std::endl;
       //reset
       currX = xLoc;
       currY = yLoc;
@@ -126,16 +128,18 @@ namespace map{
     for (int n = lowerBound; n < upperBound; n++){
       //integrate
       for (int m = 0; m < 360; m++){
-        if (dyn[m] != 0){//if a measurement exists for this m
+        if (dyn[m] > 0 && dyn[m] < 30){//if a measurement exists for this m
           res[n] += (dyn[m]-sta[m+n])*(dyn[m]-sta[m+n]); //add the difference squared
           //std::cout << dyn[m] << ", " << sta[m+n] << std::endl;
         }
         //otherwise do nothing
       }
+      std::cout << n << ": " << res[n] << std::endl;
       if (res[n] < min){ //if found a new minimum
         min = res[n]; //update
         argmin = n;
       }
+ 
     }
     std::cout << "max gotten" << std::endl;
     return argmin;
@@ -169,20 +173,22 @@ namespace map{
     std::cout << "stepping " << stepTh << std::endl;
     
     while(currTh < upperBound){
-      for (int i = 0; i < 5; i++){//update because of low-pass filter
+      /*for (int i = 0; i < 5; i++){//update because of low-pass filter
         front.getHighestProbDistance();
         right.getHighestProbDistance();
-      }
+      }*/
       //take readings, turn
-      readings[(int)currTh] = front.getHighestProbDistance()/10;
-      readings[((int)currTh+90)%360] = right.getHighestProbDistance()/10;
-      dt.turnForDegrees(stepTh);
-      
+      readings[(int)currTh] = (front.getHighestProbDistance()+2)/10;
+      readings[((int)currTh+90)%360] = (right.getHighestProbDistance()+5)/10;
+      dt.turnForDegrees(stepTh, 2.5);
+      //std::cout << readings[(int)currTh]<<", " << readings[((int)currTh+90)%360] << std::endl;
       //readings[(int)currTh] = testReadings[(int)currTh];
       currTh += stepTh; //add
       std::cout << "reached " << currTh << std::endl;
     }
-    
+    for (int i = 0; i < 360; i++){
+      std::cout << i << ": " << readings[i] << std::endl;
+    }
     std::cout << "done turning" << std::endl;
     return getMax(expected, readings, lowerBound, upperBound);
   }

@@ -3,6 +3,9 @@
 #include <sstream>
 #include <stdlib.h>
 #include <climits>
+#include <math.h>
+
+#define PI 3.14159265
 
 namespace map {
 
@@ -16,7 +19,7 @@ namespace map {
         return elems;
     }
 
-    Map::Map(std::string filename) {
+    Map::Map(std::string filename) : botHeading(0.0) {
         // Initialize temp structures for the map
         stacks.resize(5);
 
@@ -323,14 +326,23 @@ namespace map {
         botLocation.x += deltaX;
         botLocation.y += deltaY;
     }
-
+    
+    void Map::setLocationStraight(double actualDistance){
+      botLocation.x += sin(botHeading*PI/180.0)*actualDistance;
+      botLocation.y += cos(botHeading*PI/180.0)*actualDistance;
+    }
+    
+    void Map::setHeading(double h){botHeading=h;}
+    void Map::setHeadingRelative(double dh){botHeading+=dh;}
+    double Map::getHeading(){return botHeading;}
+    
     utils::Point Map::getNearestStack() {
         double minDistance = 500;
         utils::Point minStack;
         for(int i=0; i<stacks.size(); i++) {
             for(int j=0; j<stacks[i].size(); j++) {
                 double distance =0;
-                std::vector<DrivingInstruction> instructions = getDrivingInstructions(getPathTo(stacks[i][j]), 0);
+                std::vector<DrivingInstruction> instructions = getDrivingInstructions(getPathTo(stacks[i][j]));
                 for(int k=0; k<instructions.size(); k++) {
                     distance += instructions[k].distance;
                 }
@@ -417,9 +429,9 @@ namespace map {
         return compressed_path;    
     }
 
-    std::vector<DrivingInstruction> Map::getDrivingInstructions(std::vector<utils::Point> path, double currentHeading) {
+    std::vector<DrivingInstruction> Map::getDrivingInstructions(std::vector<utils::Point> path) {
         std::vector<DrivingInstruction> drivingInstructions;
-        double heading = currentHeading;
+        double heading = botHeading;
         for(int i=1; i<path.size(); i++) {
             double distance = path[i-1].distanceTo(path[i]) * .1;
             double dX = double(path[i].x - path[i-1].x);
@@ -434,8 +446,12 @@ namespace map {
     }
 
     void Map::print() {
-        for(int y=0; y<grid.size(); y++) {
+        for(int y=grid.size()-1; y>=0; y--) {
             for(int x=0; x<grid[y].size(); x++) {
+		if(botLocation.x==x && botLocation.y==y) {
+			std::cout << 'L' << ' ';
+			continue;
+		}
                 char charToPrint;
                 switch(grid[y][x]) {
                     case EMPTY:

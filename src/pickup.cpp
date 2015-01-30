@@ -1,7 +1,7 @@
 #include "../include/pickup.h"
 #include "../include/color.h"
 #include <iostream>
-#define SORT_CENTER 5.0
+#define SORT_CENTER 4.0
 #define SORT_FAST_DELTA 20.0
 #define SORT_OVERSHOOT_DELTA 76.0
 #define SORT_FINAL_DELTA 65.0
@@ -10,6 +10,7 @@ namespace control {
 		       firmware::Servo& sorter, firmware::LimitSwitch& limitSwitch, firmware::ColorSensor& colorSensor) : pickupMotor(pickupMotor), sorter(sorter), limitSwitch(limitSwitch), colorSensor(colorSensor), numRedBlocks(0), numGreenBlocks(0){}
 
         void Pickup::start(){
+	  numPickedUpThisTime = 0;
 	  std::thread thr(&Pickup::run, this);
 	  std::swap(thr, runner);
 
@@ -17,7 +18,6 @@ namespace control {
 
         void Pickup::run(){
 	  std::cout<<"run"<<std::endl;
-	  limitSwitch.startPoll();
 	  sorter.setServoPosition(SORT_CENTER);
 	  running=1;
 	  pickupMotor.setSpeed(-0.5);
@@ -69,7 +69,6 @@ namespace control {
 	  }
 	  usleep(50000);
 	  pickupMotor.setSpeed(0.0);
-	  limitSwitch.stopPoll();
 	  colorSensor.stopPoll();
 	}
 
@@ -84,6 +83,26 @@ namespace control {
 
         int Pickup::numGreenBlocksPickedUp(){
 	  return numGreenBlocks;
+	}
+
+	int Pickup::numOurTeamBlocks(utils::Color mode) {
+		if(mode==utils::Color::RED) {
+			return numRedBlocks;
+		} else {
+			return numGreenBlocks;
+		} 
+	}
+
+	int Pickup::numTheirTeamBlocks(utils::Color mode) {
+		if(mode==utils::Color::RED) {
+			return numGreenBlocks;
+		} else {
+			return numRedBlocks;
+		}
+	}
+
+	int Pickup::getNumPickedUpThisTime() {
+		return numPickedUpThisTime;
 	}
 
         void Pickup::releaseStack(utils::Color stackColor){

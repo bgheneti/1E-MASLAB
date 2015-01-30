@@ -48,7 +48,7 @@ namespace firmware{
           stdDev = (usS + irS)/2;
         }
         else{ //if us is still unreasonable
-          currDistance = -1; //this entire reading should be taken as invalid
+          currDistance = usDist;//currDistance = -1; //this entire reading should be taken as invalid
         }
       }
     }
@@ -68,12 +68,12 @@ namespace firmware{
         //leave past estimates as they are
       }
       else{ //if there is current information
-        estimatedDistance = estimatedDistance*0.9+currDistance*0.1; //factor it in
+        estimatedDistance = estimatedDistance*0.8+currDistance*0.2; //factor it in
         longTermDistance = longTermDistance*0.99+currDistance*0.01;
       }
     }
     
-    return estimatedDistance;
+    return currDistance;
   }
   
   //returns a reasonable lower bound

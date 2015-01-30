@@ -1,12 +1,18 @@
 #include "../include/cam_vision.h"
+#include "../include/map.h"
 #include <cassert>
 #include <iostream>
 #include <time.h>
 #include <stdio.h>
 #include "opencv2/opencv.hpp"
-#include "cmath"
+#include <math.h>
+#include <float.h>
 #include <complex>
-#include <queue>  
+#include <queue>
+#include <unistd.h>
+#define minBlobSize 25
+#define wallHeightThreshold 4
+#define pi (4 * atan(1))
 using namespace cv;
 using namespace vision;
 namespace vision{
@@ -33,7 +39,7 @@ namespace vision{
 	  *(p+2) = 0;
 	  floodFill(inFrame,Point(col,row),Scalar(0, 255, 0));
 	}
-	else if((b > ( r * 3))){
+	else if((b > ( r * 2))){
 	  *p = 255;
 	  *(p+1) = 0;
 	  *(p+2) = 0;
@@ -103,42 +109,55 @@ namespace vision{
 
   std::vector<vector<int> > vision::Cam::findPoints(Mat& inFrame){
     //std::cout<<"find"<<std::endl;
-
+    std::vector<vector<int> > allPoints;
     std::vector<int> redPoint(2,-1);
     std::vector<int> greenPoint(2,-1);
     int width=inFrame.cols;
-    int wallHeightThreshhold=4;
     int height=inFrame.rows;
     bool foundAll=false;
     for(int i=width-1; i>-1;i--){
       for(int j=height-1;j>-1;j--){
+	/*
 	if((j<redPoint[1])&&(j<greenPoint[1])){
 	  foundAll=true;
 	  break;
 	}
-        else if(inFrame.at<Vec3b>(j,i)[1]==255){
-	  //std::cout<<"found"<<std::endl;
+	*/
+        if(inFrame.at<Vec3b>(j,i)[1]==255){
 	  inFrame.at<Vec3b>(j,i)=Vec3b(0,127,0);
 	  std::vector<int>val=expandPoint(i,j,inFrame,1);
-	  //std::cout<<"setting found"<<std::endl;
-	  if((val[0]>10) && (val[2]>greenPoint[1])){
-	    greenPoint[0]=val[1];
-	    greenPoint[1]=val[2];
+	  if(val[0]>minBlobSize){
+	    std::vector<int> point;
+	    point.push_back(val[1]);
+	    point.push_back(val[2]);
+	    point.push_back(1);
+	    allPoints.push_back(point);
+	    /*
+	    if(val[2]>greenPoint[1]){
+	      greenPoint=point
+	    }
+	    */
 	  }
 	}
 	else if(inFrame.at<Vec3b>(j,i)[2]==255){
-	  //std::cout<<"found"<<std::endl;
 	  inFrame.at<Vec3b>(j,i)=Vec3b(0,0,127);
 	  std::vector<int>val=expandPoint(i,j,inFrame,0);
-	  //std::cout<<"setting found"<<std::endl;
-	  if((val[0]>10) && (val[2]>redPoint[1])){
-	    redPoint[0]=val[1];
-	    redPoint[1]=val[2];
+	  if(val[0]>minBlobSize){
+	    std::vector<int> point;
+	    point.push_back(val[1]);
+	    point.push_back(val[2]);
+	    point.push_back(0);
+	    allPoints.push_back(point);
+	    /*
+	    if(val[2]>redPoint[1]){
+	      redPoint=point;
+	    }
+	    */
 	  }
 	}
 	else if(inFrame.at<Vec3b>(j,i)[0]==255){
 	  bool isWall=true;
-	  for(int y=j;y>std::max(j-wallHeightThreshhold,-1);y--){
+	  for(int y=j;y>std::max(j-wallHeightThreshold,-1);y--){
 	    if(inFrame.at<Vec3b>(y,i)[0]==255){
 	      inFrame.at<Vec3b>(y,i)=Vec3b(240,240,0);    
 	    }
@@ -147,7 +166,7 @@ namespace vision{
 	      break;
 	    }
 	  }
-	  std::cout<<isWall<<std::endl;
+	  //std::cout<<isWall<<std::endl;
 	  if(isWall){
 	    for(int y=j-5;y>-1;y--){
 	      inFrame.at<Vec3b>(y,i)=Vec3b(0,0,0);
@@ -155,15 +174,18 @@ namespace vision{
 	  }
 	}
       }
+      /*
       if(foundAll){
 	break;
       }
+      */
     }
-    std::cout<<"green:"<<greenPoint[0]<<","<<greenPoint[1]<<std::endl;
+    /*
     std::vector<vector<int> > points;
     points.push_back(redPoint);
     points.push_back(greenPoint);
-    return points;
+    */
+    return allPoints;
   }
 
 
@@ -176,9 +198,31 @@ namespace vision{
     blocks.clear();
     double frameHeight=inFrame.rows;
     double frameWidth=inFrame.cols;
-    int i=0;
-   
+
     vector<vector<int> > points = findPoints(inFrame);
+    for(int i=0;i<points.size();i++){
+      double X = points[i][0];
+      double Y = points[i][1];
+      Color color=(Color)points[i][2];
+      //printf("block: x:%f, y:%f, red:%d\n",X,Y,color);
+
+      for(int x=std::max(0.0,X-3);x<std::min(X+4,frameWidth);x++){
+        for(int y=std::max(0.0,Y-3);y<std::min(Y+4,frameHeight);y++){
+          inFrame.at<Vec3b>(Point(x,y))=Vec3b(255,255,255);
+        }
+      }
+
+      double angle= 60 * ( (X-frameWidth/2) / frameWidth);
+      double forwardDistance = (height * tan( (pi / 180) * (90-hViewAngle/2-angleDown+hViewAngle * (frameHeight-Y)/frameHeight))+cameraDistance);
+      double distance = forwardDistance/cos( (pi / 180) * angle);
+      vector<double> position;
+      position.push_back(angle);
+      position.push_back(distance);
+      Block block(position,color);
+      blocks.push_back(block);
+      //std::cout<<"made block"<<std::endl;
+    }
+    /*
     Vector<int> redPoint=points[0];
     vector<int> greenPoint=points[1];
     if(redPoint[0]!=-1){
@@ -224,6 +268,7 @@ namespace vision{
       blocks.push_back(block);
       //std::cout<<"made block"<<std::endl;
     }
+    */
     //std::cout<<"made all blocks"<<std::endl;    
   }
 
@@ -250,7 +295,6 @@ namespace vision{
   }
  
   void Cam::poll(){
-    std::cout << 1 << std::endl;
     VideoCapture cap(0);
     assert(cap.isOpened());
     //namedWindow( "Display window", WINDOW_AUTOSIZE );
@@ -268,12 +312,12 @@ namespace vision{
     assert(outVid.isOpened());
     //std::cout << "windowing" << std::endl;
     //imshow( "Display window", testOut);
-    std::cout << running << std::endl;
     while (running) {
       Mat frame;
       cap >> frame;
       processFrame(frame, out);
       findCubes(out);
+      outVid<<out;
     }
   }
 
@@ -293,4 +337,26 @@ namespace vision{
     return blocks;
   }
 
+  
+  map::DrivingInstruction Cam::getDirectionToBlock(double distance, double heading){
+     usleep(1500000);
+     std::vector<Block> stacks=blocks;
+     map::DrivingInstruction closestStack;
+     if(stacks.size()>0){
+       double minDiff=DBL_MAX;
+       closestStack=map::DrivingInstruction(0,minDiff);
+       for(int i=0;i<stacks.size();i++){
+	 double stackHeading=stacks[i].getAngle();
+	 double stackDistance=stacks[i].getDistance();
+	 double diffX=sin(heading/180*pi)*distance-sin(stackHeading/180*pi)*stackDistance;
+	 double diffY=cos(heading/180*pi)*distance-cos(stackHeading/180*pi)*stackDistance;
+	 double diff=pow((pow(diffX,2)+pow(diffY,2)),0.5);
+	 if(diff<minDiff){
+	   minDiff=diff;
+	   closestStack=map::DrivingInstruction(stackHeading,stackDistance);
+	 }
+       }
+     }
+     return closestStack;
+  }
 }

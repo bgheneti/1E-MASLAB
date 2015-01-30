@@ -6,6 +6,7 @@
 #include "servo_firmware.h"
 #include "limit_switch_firmware.h"
 #include "color_sensor_firmware.h"
+#include "color.h"
 #include <thread>
 
 namespace control {
@@ -21,6 +22,7 @@ namespace control {
 			int numGreenBlocks;
 			int numBlocks;
 			int running;
+			int numPickedUpThisTime;
 		public:
 			Pickup(firmware::Motor& pickupMotor,
 			       firmware::Servo& sorter,
@@ -33,6 +35,9 @@ namespace control {
 
 			int numRedBlocksPickedUp();
 			int numGreenBlocksPickedUp();
+			int numOurTeamBlocks(utils::Color mode);
+			int numTheirTeamBlocks(utils::Color mode);
+			int getNumPickedUpThisTime();
 			void releaseStack(utils::Color stackColor);
 
 	};

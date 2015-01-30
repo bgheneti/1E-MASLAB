@@ -27,6 +27,8 @@ namespace map {
         double heading;
         double distance;
         DrivingInstruction(double heading, double distance) : heading(heading), distance(distance) {}
+        DrivingInstruction(): heading(0),distance(-1) {}
+
     };
 
     class Map {
@@ -34,6 +36,7 @@ namespace map {
             std::vector<std::vector<Element> > grid;
             std::vector<std::vector<utils::Point> > stacks;
             utils::Point botLocation;
+	    double botHeading;
             std::vector<utils::Point> walls; // even start point and odd end point
             std::vector<utils::Point> homebase; // vertices in the polygon
             std::vector<utils::Point> passableElements;
@@ -58,10 +61,14 @@ namespace map {
             void setLocation(int x, int y);
             void setLocationRelative(double deltaX, double deltaY);
             void setLocationRelative(int deltaX, int deltaY);
+            void setLocationStraight(double actualDistance);
+            void setHeading(double h);
+            void setHeadingRelative(double dh);
+            double getHeading();
             utils::Point whereToDropStack(Zone zone);
             utils::Point getNearestStack();
             std::vector<utils::Point> getPathTo(utils::Point goal);
-            std::vector<DrivingInstruction> getDrivingInstructions(std::vector<utils::Point>, double currentHeading);
+            std::vector<DrivingInstruction> getDrivingInstructions(std::vector<utils::Point>);
             void print();
 
     };

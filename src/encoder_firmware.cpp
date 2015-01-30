@@ -76,7 +76,7 @@ void Encoder::updateTick(uint8_t oldPhase, uint8_t newPhase) {
   } else if ((delta  == -1) || (delta == 3)) {
     count--;
   } else {
-    printf("Invalid Transition from %x to %x\r\n", oldPhase, newPhase);
+//    printf("Invalid Transition from %x to %x\r\n", oldPhase, newPhase);
   }
 }
 

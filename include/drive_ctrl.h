@@ -7,6 +7,7 @@
 #include "../include/encoder_firmware.h"
 #include "../include/motor_firmware.h"
 #include "../include/gyro_firmware.h"
+#include "../include/rangefinder_firmware.h"
 #include <mutex>
 #include <time.h>
 #include <cmath>
@@ -20,13 +21,15 @@
             firmware::Encoder &leftEncoder;
             firmware::Encoder &rightEncoder;
             firmware::Gyro &gyro;
-
+            firmware::Rangefinder &front;
+            
+            double angleOffset;
             double bias;
             double power;
             bool driving;
             // Zero the encoders and gyro
             void resetSensors();
-            void controlPID(double distance, double heading);
+            double controlPID(double distance, double heading, double tolerance, double wallAllowance);
 
 
         public:
@@ -36,15 +39,16 @@
                   firmware::Motor &rightMotor,
                   firmware::Encoder &leftEncoder, 
                   firmware::Encoder &rightEncoder,
-                  firmware::Gyro &gyro);
+                  firmware::Gyro &gyro,
+		  firmware::Rangefinder &front);
 
             // Move straight for some distance. If distance > 0, forward
             // otherwise backward.
-            void straightForDistance(double distance);
+            double straightForDistance(double distance, double wallAllowance);
 
             // Have the robot turn for some number of degrees. If degrees
             // is negative, turn left; if positive turn right.
-            void turnForDegrees(double degrees);
+            double turnForDegrees(double degrees, double tolerance);
 
     };
 

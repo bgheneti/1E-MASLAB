@@ -21,7 +21,7 @@ namespace firmware{
     
     //send pulse
     trigger.write(1);
-    usleep(10);
+    //usleep(10);
     trigger.write(0);
     
     //record starting time
@@ -57,7 +57,7 @@ namespace firmware{
     }
     
     //calculate distance
-    if (diff*34000/2 > 100){
+    if (diff*34000/2 > 300){
       return -1;
     }
     else{
